@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DbProxy
 {
-    class Element
+    public class Element
     {
         public Guid Id { get; set; }
         /// <summary>
