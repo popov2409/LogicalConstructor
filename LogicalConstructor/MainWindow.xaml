@@ -16,7 +16,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Canvas Name="EditorCanvas" Grid.Column="1" Grid.Row="1" Background="#FFF7F8D3">
+        <Canvas Name="EditorCanvas" Grid.Column="1" Grid.Row="1" Background="#FFF7F8D3" PreviewMouseDown="EditorCanvas_OnPreviewMouseDown">
             <Canvas.ContextMenu>
                 <ContextMenu>
                     <MenuItem Name="AddElementMenuItem"  Header="Добавить элемент"  Click="AddElementMenuItem_OnClick"/>

@@ -29,7 +29,7 @@ namespace LogicalConstructor
         {
             ElementControl el=new ElementControl();
             el.PreviewMouseMove += El_PreviewMouseMove;
-
+            el.SetLocation(mousePoint);
             EditorCanvas.Children.Add(el);
         }
 
@@ -41,6 +41,12 @@ namespace LogicalConstructor
             //Canvas.SetTop(sender as ElementControl, e.GetPosition(EditorCanvas).Y - 10);
             //Canvas.SetLeft(sender as ElementControl, e.GetPosition(EditorCanvas).X - (sender as ElementControl).MousePoint.X);
             //Canvas.SetTop(sender as ElementControl, e.GetPosition(EditorCanvas).Y - (sender as ElementControl).MousePoint.Y);
+        }
+
+        private Point mousePoint;
+        private void EditorCanvas_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            mousePoint = e.GetPosition(EditorCanvas);
         }
     }
 }
