@@ -30,17 +30,17 @@ namespace LogicalConstructor
             ElementControl el=new ElementControl();
             el.PreviewMouseMove += El_PreviewMouseMove;
 
-            EditorGrid.Children.Add(el);
+            EditorCanvas.Children.Add(el);
         }
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (!(sender as ElementControl).IsSelected) return;
-
-            Thickness thickness = (sender as ElementControl).Margin;
-            thickness.Left = e.GetPosition(EditorGrid).X-5;
-            thickness.Top = e.GetPosition(EditorGrid).Y-5;
-            (sender as ElementControl).Margin = thickness;
+            (sender as ElementControl).SetLocation(e.GetPosition(EditorCanvas));
+            //Canvas.SetLeft(sender as ElementControl, e.GetPosition(EditorCanvas).X - 10);
+            //Canvas.SetTop(sender as ElementControl, e.GetPosition(EditorCanvas).Y - 10);
+            //Canvas.SetLeft(sender as ElementControl, e.GetPosition(EditorCanvas).X - (sender as ElementControl).MousePoint.X);
+            //Canvas.SetTop(sender as ElementControl, e.GetPosition(EditorCanvas).Y - (sender as ElementControl).MousePoint.Y);
         }
     }
 }
