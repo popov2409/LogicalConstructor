@@ -5,9 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LogicalConstructor"
              mc:Ignorable="d" 
-             d:DesignHeight="80" d:DesignWidth="60">
+             Height="80" Width="60" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseDown="ElementControl_OnPreviewMouseDown" PreviewMouseUp="ElementControl_OnPreviewMouseUp" MouseLeave="ElementControl_OnMouseLeave" >
     <Grid>
-        <Rectangle Stroke="Black" StrokeThickness="2" Fill="White" Margin="5"/>
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Свойства"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+        <Rectangle Name="Rectangle" Stroke="Black" StrokeThickness="2" Fill="White" Margin="5"/>
+        <Ellipse Name="Ellipse" Stroke="Black" StrokeThickness="2" Fill="White" HorizontalAlignment="Right" VerticalAlignment="Center" Width="10" Height="10"/>
+        <Label Name="ElementName" Content="1" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="22" Margin="0,2,5,0"></Label>
 
     </Grid>
 </UserControl>

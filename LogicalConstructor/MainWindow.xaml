@@ -19,7 +19,7 @@
         <Grid Name="EditorGrid" Grid.Column="1" Grid.Row="1" Background="#FFF7F8D3">
             <Grid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Добавить элемент"/>
+                    <MenuItem Name="AddElementMenuItem"  Header="Добавить элемент"  Click="AddElementMenuItem_OnClick"/>
                 </ContextMenu>
             </Grid.ContextMenu>
         </Grid>

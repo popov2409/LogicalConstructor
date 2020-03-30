@@ -24,5 +24,23 @@ namespace LogicalConstructor
         {
             InitializeComponent();
         }
+
+        private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            ElementControl el=new ElementControl();
+            el.PreviewMouseMove += El_PreviewMouseMove;
+
+            EditorGrid.Children.Add(el);
+        }
+
+        private void El_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!(sender as ElementControl).IsSelected) return;
+
+            Thickness thickness = (sender as ElementControl).Margin;
+            thickness.Left = e.GetPosition(EditorGrid).X-5;
+            thickness.Top = e.GetPosition(EditorGrid).Y-5;
+            (sender as ElementControl).Margin = thickness;
+        }
     }
 }
