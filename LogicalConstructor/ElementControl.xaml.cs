@@ -22,6 +22,8 @@ namespace LogicalConstructor
     {
         public bool IsSelected;
         public Point MousePoint;
+        //public Ele
+
         public ElementControl()
         {
             InitializeComponent();

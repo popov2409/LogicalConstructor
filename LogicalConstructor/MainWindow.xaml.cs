@@ -48,5 +48,10 @@ namespace LogicalConstructor
         {
             mousePoint = e.GetPosition(EditorCanvas);
         }
+
+        private void ExitMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }
