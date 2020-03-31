@@ -10,27 +10,25 @@ namespace LogicalConstructor.DbProxy
 {
     public class SaverClass
     {
-        public static List<ElementClass> Elements;
-
-        public static void Initialize()
+        public List<ElementClass> Elements { get; set; }
+        public SaverClass()
         {
-            Elements=new List<ElementClass>();
+            Elements = new List<ElementClass>();
         }
 
-        public static async Task SaveData(string path)
+
+        public async Task SaveData(string path)
         {
-            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream(path, FileMode.Create))
             {
                 await JsonSerializer.SerializeAsync<List<ElementClass> >(fs, Elements);
             }
         }
 
-        public static async Task LoadData(string path)
+        public void LoadData(string path)
         {
-            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                Elements = await JsonSerializer.DeserializeAsync<List<ElementClass>>(fs);
-            }
+            string jsonString = File.ReadAllText(path);
+            Elements = JsonSerializer.Deserialize<List<ElementClass>>(jsonString);
         }
     }
 }
