@@ -5,8 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogicalConstructor.View"
         mc:Ignorable="d"
-        Title="" Height="150" Width="200" WindowStyle="ToolWindow">
+        Title="" Height="100" Width="220" WindowStyle="None">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0" Content="Тип элемента" Margin="0,0,5,0"/>
+        <ComboBox  Grid.Row="0" Grid.Column="1" Name="ElementTypeComboBox" SelectedIndex="2" SelectionChanged="ElementTypeComboBox_SelectionChanged" >
+            <Label Content="И"/>
+            <Label Content="ИЛИ"/>
+            <Label Content="НЕ"/>
+            <Label Content="И-НЕ"/>
+            <Label Content="ИЛИ-НЕ"/>
+        </ComboBox>
+        <Label Grid.Row="1" Grid.Column="0" Content="Колличество входов" Margin="0,0,5,0"/>
+        <TextBox Name="InCountTextBox" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center" Text="1"/>
+
+        <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Name="SaveButton" Grid.Column="0"  Margin="2" Content="Сохранить" Click="SaveButton_OnClick"/>
+            <Button Name="CancelButton" Grid.Column="1" Margin="2" Content="Отменить" Click="CancelButton_OnClick"/>
+        </Grid>
+
+
     </Grid>
 </Window>

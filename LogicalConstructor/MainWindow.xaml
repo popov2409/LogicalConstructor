@@ -21,8 +21,8 @@
         <DockPanel Grid.Row="0" Grid.ColumnSpan="2">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_Файл">
-                    <MenuItem Header="_Сохранить схему" />
-                    <MenuItem Header="_Открыть схему" />
+                    <MenuItem Name="SaveItem" Header="_Сохранить схему" Click="SaveItem_Click" />
+                    <MenuItem Name="OpenItem" Header="_Открыть схему" />
                     <Separator />
                     <MenuItem Name="ExitMenuItem" Header="_Выход" Click="ExitMenuItem_OnClick"/>
                 </MenuItem>

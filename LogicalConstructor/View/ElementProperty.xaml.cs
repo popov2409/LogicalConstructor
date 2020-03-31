@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using LogicalConstructor.DbProxy;
 
 namespace LogicalConstructor.View
 {
@@ -19,9 +20,33 @@ namespace LogicalConstructor.View
     /// </summary>
     public partial class ElementProperty : Window
     {
-        public ElementProperty()
+        private ElementControl _element;
+        public ElementProperty(ElementControl element)
         {
             InitializeComponent();
+            _element = element;
+            ElementTypeComboBox.SelectedIndex = _element.Element.Type;
+            InCountTextBox.Text = _element.Element.InCount.ToString();
+            this.Left = Canvas.GetLeft(element);
+            this.Top = Canvas.GetTop(element);
+        }
+
+        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void ElementTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (InCountTextBox==null) return;
+            InCountTextBox.Text = (ElementTypeComboBox.SelectedIndex == 2) ? "1" : InCountTextBox.Text;
+        }
+
+        private void SaveButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            _element.Element.Type = ElementTypeComboBox.SelectedIndex;
+            _element.Element.InCount = int.Parse(InCountTextBox.Text);
+            this.Close();
         }
     }
 }

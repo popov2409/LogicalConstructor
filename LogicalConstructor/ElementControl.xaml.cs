@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LogicalConstructor.DbProxy;
+using LogicalConstructor.View;
 
 namespace LogicalConstructor
 {
@@ -22,7 +24,7 @@ namespace LogicalConstructor
     {
         public bool IsSelected;
         public Point MousePoint;
-        //public Ele
+        public ElementClass Element;
 
         public ElementControl()
         {
@@ -35,6 +37,15 @@ namespace LogicalConstructor
             Rectangle.Stroke = brushes;
             Ellipse.Stroke = brushes;
             ElementName.Foreground = brushes;
+            OutLine.Stroke = brushes;
+            foreach (var child in InGrid.Children)
+            {
+                if (child is Line)
+                {
+                    (child as Line).Stroke = brushes;
+                }
+
+            }
         }
 
         public void Unselected()
@@ -48,7 +59,6 @@ namespace LogicalConstructor
             Selected(Brushes.Blue);
             this.CaptureMouse();
             MousePoint = e.GetPosition(this);
-            //MessageBox.Show($"{MousePoint.X}   {MousePoint.Y}");
         }
 
         private void ElementControl_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -59,16 +69,6 @@ namespace LogicalConstructor
             this.ReleaseMouseCapture();
         }
 
-        private void ElementControl_OnMouseLeave(object sender, MouseEventArgs e)
-        {
-            //IsSelected = false;
-            //Selected(Brushes.Black);
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            Ellipse.Visibility = Visibility.Visible;
-        }
 
        private void AndItem_OnChecked(object sender, RoutedEventArgs e)
         {
@@ -100,8 +100,33 @@ namespace LogicalConstructor
             Point resPoint = point - (Vector)MousePoint;
             Canvas.SetLeft(this,resPoint.X);
             Canvas.SetTop(this,resPoint.Y);
+            Element.Location = resPoint;
 
+        }
 
+        private void PropertyItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            new ElementProperty(this).ShowDialog();
+            UpdateView();
+        }
+
+        public void UpdateView()
+        {
+            Ellipse.Visibility = Element.Type > 1 ? Visibility.Visible : Visibility.Hidden;
+            ElementName.Content = (Element.Type == 0 || Element.Type == 3) ? "&" : "1";
+            InGrid.Children.Clear();
+            InGrid.RowDefinitions.Clear();
+            for (int i = 0; i < Element.InCount; i++)
+            {
+                InGrid.RowDefinitions.Add(new RowDefinition());
+                Line l = new Line()
+                {
+                    Stroke = Brushes.Black, StrokeThickness = 2, X1 = 0, X2 = 5, Y1 = 0, Y2 = 0,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetRow(l,i);
+                InGrid.Children.Add(l);
+            }
         }
     }
 }

@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LogicalConstructor.DbProxy;
+using Microsoft.Win32;
 
 namespace LogicalConstructor
 {
@@ -23,35 +25,45 @@ namespace LogicalConstructor
         public MainWindow()
         {
             InitializeComponent();
+            SaverClass.Initialize();
         }
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ElementControl el=new ElementControl();
+            ElementClass element=new ElementClass(){Type = 2,InCount = 1};
+            el.Element = element;
+            el.UpdateView();
             el.PreviewMouseMove += El_PreviewMouseMove;
-            el.SetLocation(mousePoint);
+            el.SetLocation(_mousePoint);
             EditorCanvas.Children.Add(el);
+            SaverClass.Elements.Add(element);
         }
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (!(sender as ElementControl).IsSelected) return;
-            (sender as ElementControl).SetLocation(e.GetPosition(EditorCanvas));
-            //Canvas.SetLeft(sender as ElementControl, e.GetPosition(EditorCanvas).X - 10);
-            //Canvas.SetTop(sender as ElementControl, e.GetPosition(EditorCanvas).Y - 10);
-            //Canvas.SetLeft(sender as ElementControl, e.GetPosition(EditorCanvas).X - (sender as ElementControl).MousePoint.X);
-            //Canvas.SetTop(sender as ElementControl, e.GetPosition(EditorCanvas).Y - (sender as ElementControl).MousePoint.Y);
+            if (!((ElementControl) sender).IsSelected) return;
+            ((ElementControl) sender).SetLocation(e.GetPosition(EditorCanvas));
         }
 
-        private Point mousePoint;
+        private Point _mousePoint;
         private void EditorCanvas_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            mousePoint = e.GetPosition(EditorCanvas);
+            _mousePoint = e.GetPosition(EditorCanvas);
         }
 
         private void ExitMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void SaveItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog ofd = new SaveFileDialog() {Title = "Введите имя файла", Filter = "json files (*.json)|*.json" };
+            if (ofd.ShowDialog() == true)
+            {
+                SaverClass.SaveData(ofd.FileName);
+            }
         }
     }
 }
