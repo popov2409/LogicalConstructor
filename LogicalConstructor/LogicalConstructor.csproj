@@ -55,6 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DbProxy\ElementClass.cs" />
+    <Compile Include="DbProxy\SaverClass.cs" />
     <Compile Include="View\ElementProperty.xaml.cs">
       <DependentUpon>ElementProperty.xaml</DependentUpon>
     </Compile>
