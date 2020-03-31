@@ -25,6 +25,7 @@ namespace LogicalConstructor
         public bool IsSelected;
         public Point MousePoint;
         public ElementClass Element;
+        public bool IsDrag;
 
         public ElementControl()
         {
@@ -32,7 +33,7 @@ namespace LogicalConstructor
             IsSelected = false;
         }
 
-        public void Selected(Brush brushes)
+        public void SetColor(Brush brushes)
         {
             Rectangle.Stroke = brushes;
             Ellipse.Stroke = brushes;
@@ -48,52 +49,28 @@ namespace LogicalConstructor
             }
         }
 
+        public void Selected()
+        {
+            IsSelected = true;
+            SetColor(Brushes.Blue);
+           // this.CaptureMouse();
+        }
+
         public void Unselected()
         {
-            Selected(Brushes.Black);
+            IsSelected = false;
+            SetColor(Brushes.Black);
+           // this.ReleaseMouseCapture();
         }
 
         private void ElementControl_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = true;
-            Selected(Brushes.Blue);
-            this.CaptureMouse();
+            Selected();
             MousePoint = e.GetPosition(this);
-        }
-
-        private void ElementControl_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-
-            IsSelected = false;
-            Selected(Brushes.Black);
-            this.ReleaseMouseCapture();
+            IsDrag = true;
         }
 
 
-       private void AndItem_OnChecked(object sender, RoutedEventArgs e)
-        {
-            ElementName.Content = "&";
-            Ellipse.Visibility = Visibility.Hidden;
-        }
-
-        private void OrItem_OnChecked(object sender, RoutedEventArgs e)
-        {
-            if (ElementName==null) return;
-            ElementName.Content = "1";
-            Ellipse.Visibility = Visibility.Hidden;
-        }
-
-        private void AndNotItem_OnChecked(object sender, RoutedEventArgs e)
-        {
-            ElementName.Content = "&";
-            Ellipse.Visibility = Visibility.Visible;
-        }
-
-        private void OrNotItem_OnChecked(object sender, RoutedEventArgs e)
-        {
-            ElementName.Content = "1";
-            Ellipse.Visibility = Visibility.Visible;
-        }
 
         public void SetLocation(Point point)
         {
@@ -121,12 +98,35 @@ namespace LogicalConstructor
                 InGrid.RowDefinitions.Add(new RowDefinition());
                 Line l = new Line()
                 {
-                    Stroke = Brushes.Black, StrokeThickness = 2, X1 = 0, X2 = 5, Y1 = 0, Y2 = 0,
+                    Stroke = Brushes.Black, StrokeThickness = 2, X1 = 0, X2 = 10, Y1 = 0, Y2 = 0,
                     VerticalAlignment = VerticalAlignment.Center
                 };
+                l.PreviewMouseDown += L_PreviewMouseDown;
                 Grid.SetRow(l,i);
                 InGrid.Children.Add(l);
             }
+        }
+
+        private void L_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ((Line)sender).Stroke = Brushes.Crimson;
+        }
+
+        private void UserControl_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            IsDrag = false;
+        }
+
+        private void AddConnectorItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            Element.InCount++;
+            UpdateView();
+        }
+
+        private void DeleteConnectorItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            Element.InCount--;
+            UpdateView();
         }
     }
 }

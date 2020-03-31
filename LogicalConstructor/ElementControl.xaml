@@ -5,18 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LogicalConstructor"
              mc:Ignorable="d" 
-             Height="60" Width="50" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseDown="ElementControl_OnPreviewMouseDown" PreviewMouseUp="ElementControl_OnPreviewMouseUp">
+             Height="60" Width="60" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseDown="ElementControl_OnPreviewMouseDown" PreviewMouseUp="UserControl_PreviewMouseUp" >
     <Grid>
         <Grid.ContextMenu>
-            <ContextMenu>
+            <ContextMenu> 
+                <MenuItem Name="AddConnectorItem" Header="Добавить вход" Click="AddConnectorItem_OnClick"/>
+                <MenuItem Name="DeleteConnectorItem" Header="Удалить вход" Click="DeleteConnectorItem_OnClick"/>
                 <MenuItem Name="PropertyItem" Header="Свойства" Click="PropertyItem_OnClick"/>
             </ContextMenu>
         </Grid.ContextMenu>
-        <Rectangle Name="Rectangle" Stroke="Black" StrokeThickness="2" Fill="White" Margin="5,0,10,0"/>
+        <Rectangle Name="Rectangle" Stroke="Black" StrokeThickness="2" Fill="White" Margin="10,0,10,0"/>
         <Line Name="OutLine" Stroke="Black" StrokeThickness="2" HorizontalAlignment="Right" VerticalAlignment="Center" X1="0" X2="10" Y1="0" Y2="0"/>
         <Ellipse Name="Ellipse" Stroke="Black" StrokeThickness="2" Fill="White" HorizontalAlignment="Right" VerticalAlignment="Center" Width="10" Height="10" Visibility="Visible" Margin="0,0,5,0"/>
         <Label Name="ElementName" Content="1" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="16" Margin="0,0,10,0"/>
-        <Grid Name="InGrid" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="5"/>
+        <Grid Name="InGrid" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="10"/>
 
     </Grid>
 </UserControl>

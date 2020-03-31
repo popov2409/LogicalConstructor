@@ -44,12 +44,25 @@ namespace LogicalConstructor
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (!((ElementControl) sender).IsSelected) return;
+            if(!((ElementControl)sender).IsDrag) return;
             ((ElementControl) sender).SetLocation(e.GetPosition(EditorCanvas));
+        }
+
+        void ClearAllSelection()
+        {
+            foreach (UIElement child in EditorCanvas.Children)
+            {
+                if (child is ElementControl)
+                {
+                    ((ElementControl)child).Unselected();
+                }
+            }
         }
 
         private Point _mousePoint;
         private void EditorCanvas_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            ClearAllSelection();
             _mousePoint = e.GetPosition(EditorCanvas);
         }
 
@@ -64,7 +77,7 @@ namespace LogicalConstructor
             if (ofd.ShowDialog() == true)
             {
                 _saver.SaveData(ofd.FileName);
-            }анение 
+            }
         }
 
         private void OpenItem_OnClick(object sender, RoutedEventArgs e)
@@ -83,6 +96,31 @@ namespace LogicalConstructor
                     el.SetLocation(element.Location);
                     EditorCanvas.Children.Add(el);
                 }
+            }
+        }
+
+        private void EditorCanvas_OnPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            ElementControl el;
+            if (e.Key == Key.Delete)
+            {
+                if(MessageBox.Show("Вы действительно хотите удалить элемент?","",MessageBoxButton.YesNo)!=MessageBoxResult.Yes) return;
+                foreach (UIElement child in EditorCanvas.Children)
+                {
+                    if (child is ElementControl)
+                    {
+                        if (((ElementControl) child).IsSelected)
+                        {
+                            el=child as ElementControl;
+                            _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
+                            EditorCanvas.Children.Remove(el);
+                            break;
+                        }
+
+                    }
+                }
+
+                
             }
         }
     }
