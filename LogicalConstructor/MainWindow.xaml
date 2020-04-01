@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogicalConstructor"
         mc:Ignorable="d"
-        Title="Редактор логических элементов" Height="600" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" PreviewKeyUp="EditorCanvas_OnPreviewKeyUp">
+        Title="Редактор логических элементов" Height="600" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" PreviewKeyUp="EditorCanvas_OnPreviewKeyUp" PreviewMouseUp="MainWindow_OnPreviewMouseUp">
 
 
     <Grid >

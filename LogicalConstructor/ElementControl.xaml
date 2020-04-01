@@ -6,12 +6,13 @@
              xmlns:local="clr-namespace:LogicalConstructor"
              mc:Ignorable="d" 
              Height="60" Width="60" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseDown="ElementControl_OnPreviewMouseDown" PreviewMouseUp="UserControl_PreviewMouseUp" >
-    <Grid>
+    <Grid Name="MainGrid">
         <Grid.ContextMenu>
             <ContextMenu> 
-                <MenuItem Name="AddConnectorItem" Header="Добавить вход" Click="AddConnectorItem_OnClick"/>
-                <MenuItem Name="DeleteConnectorItem" Header="Удалить вход" Click="DeleteConnectorItem_OnClick"/>
-                <MenuItem Name="PropertyItem" Header="Свойства" Click="PropertyItem_OnClick"/>
+                <MenuItem Name="AddConnectorItem" Header="_Добавить вход" Click="AddConnectorItem_OnClick"/>
+                <MenuItem Name="DeleteConnectorItem" Header="_Удалить вход" Click="DeleteConnectorItem_OnClick"/>
+                <Separator/>
+                <MenuItem Name="PropertyItem" Header="_Свойства" Click="PropertyItem_OnClick"/>
             </ContextMenu>
         </Grid.ContextMenu>
         <Rectangle Name="Rectangle" Stroke="Black" StrokeThickness="2" Fill="White" Margin="10,0,10,0"/>

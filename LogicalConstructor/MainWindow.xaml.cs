@@ -29,6 +29,7 @@ namespace LogicalConstructor
             _saver=new SaverClass();
         }
 
+        
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ElementControl el=new ElementControl();
@@ -52,9 +53,9 @@ namespace LogicalConstructor
         {
             foreach (UIElement child in EditorCanvas.Children)
             {
-                if (child is ElementControl)
+                if (child is ElementControl control)
                 {
-                    ((ElementControl)child).Unselected();
+                    control.Unselected();
                 }
             }
         }
@@ -76,7 +77,7 @@ namespace LogicalConstructor
             SaveFileDialog ofd = new SaveFileDialog() {Title = "Введите имя файла", Filter = "json files (*.json)|*.json" };
             if (ofd.ShowDialog() == true)
             {
-                _saver.SaveData(ofd.FileName);
+                _ = _saver.SaveData(ofd.FileName);
             }
         }
 
@@ -90,38 +91,92 @@ namespace LogicalConstructor
                 foreach (ElementClass element in _saver.Elements)
                 {
                     ElementControl el=new ElementControl();
+
                     el.Element = element;
                     el.UpdateView();
                     el.PreviewMouseMove += El_PreviewMouseMove;
                     el.SetLocation(element.Location);
+                    MenuItem conntectionMenuItem =new MenuItem() { Header = "_Соединить элемент" };
+                    conntectionMenuItem.Click += ConntectionMenuItem_Click;
+                    el.MainGrid.ContextMenu.Items.Insert(2, conntectionMenuItem);   
                     EditorCanvas.Children.Add(el);
                 }
             }
         }
 
+        private bool _connectionMode = false;
+        private Guid _idSource;
+        private void ConntectionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            _connectionMode = true;
+            _idSource = GetSelectedElement().Element.Id;
+        }
+
+        void RemoveElement(ElementControl el)
+        {
+            _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
+            EditorCanvas.Children.Remove(el);
+        }
+
+        ElementControl GetSelectedElement()
+        {
+            foreach (UIElement child in EditorCanvas.Children)
+            {
+                if (child is ElementControl control)
+                {
+                    if (control.IsSelected)
+                    {
+                        return control ;
+                    }
+
+                }
+            }
+            return null;
+        }
+
         private void EditorCanvas_OnPreviewKeyUp(object sender, KeyEventArgs e)
         {
-            ElementControl el;
             if (e.Key == Key.Delete)
             {
-                if(MessageBox.Show("Вы действительно хотите удалить элемент?","",MessageBoxButton.YesNo)!=MessageBoxResult.Yes) return;
-                foreach (UIElement child in EditorCanvas.Children)
-                {
-                    if (child is ElementControl)
-                    {
-                        if (((ElementControl) child).IsSelected)
-                        {
-                            el=child as ElementControl;
-                            _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
-                            EditorCanvas.Children.Remove(el);
-                            break;
-                        }
-
-                    }
-                }
-
-                
+                ElementControl el = GetSelectedElement();
+                if (el == null) return;
+                if (MessageBox.Show("Вы действительно хотите удалить элемент?", "", MessageBoxButton.YesNo) !=
+                    MessageBoxResult.Yes) return;
+                RemoveElement(el);
             }
+        }
+
+        void SetConnection()
+        {
+            ElementControl el = GetSelectedElement();
+            if (el == null)
+            {
+                _connectionMode = false;
+                return;
+            }
+
+            if (el.Element.InElements.Count >= el.Element.InCount)
+            {
+                MessageBox.Show("У данного элемента задействованы все входы!");
+                _connectionMode = false;
+                return;
+            }
+
+            if (el.Element.InElements.Contains(_idSource))
+            {
+                MessageBox.Show("Данные элементы уже связаны!");
+                _connectionMode = false;
+                return;
+            }
+            _saver.Elements.First(c=>c.Id==el.Element.Id).InElements.Add(_idSource);
+            MessageBox.Show("Связь добавлена!");
+            _connectionMode = false;
+        }
+
+        private void MainWindow_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!_connectionMode) return;
+            SetConnection();
         }
     }
 }
