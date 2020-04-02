@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace LogicalConstructor.DbProxy
 {
@@ -32,6 +33,16 @@ namespace LogicalConstructor.DbProxy
             InElements=new List<Guid>();
 
         }
+
+    }
+
+    public struct Connection
+    {
+        public Guid In { get; set; }
+        public Guid Out { get; set; }
+        //public Point StartPoint { get; set; }
+        //public Point EndPoint { get; set; }
+        public Polyline Line { get; set; }
 
     }
 }

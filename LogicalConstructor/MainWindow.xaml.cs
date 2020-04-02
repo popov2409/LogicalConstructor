@@ -23,13 +23,29 @@ namespace LogicalConstructor
     public partial class MainWindow : Window
     {
         private SaverClass _saver;
+
+        private int _connectionZIndex = 0;
+
+        private int _elementZIndex = 10000;
+
+        private List<Connection> _connections;
         public MainWindow()
         {
             InitializeComponent();
             _saver=new SaverClass();
+            _connections=new List<Connection>();
         }
 
-        
+        public void AddConnection(ElementControl inControl, ElementControl outControl)
+        {
+            Point p1 = new Point(Canvas.GetLeft(inControl) + inControl.Width / 2,
+                Canvas.GetTop(inControl) + inControl.Height / 2);
+            Point p2 = new Point(Canvas.GetLeft(outControl) + outControl.Width / 2,
+                Canvas.GetTop(outControl) + outControl.Height / 2);
+            Polyline polyline=new Polyline(){Stroke = Brushes.Black};
+            Connection connection=new Connection(){};
+        }
+
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ElementControl el=new ElementControl();
@@ -90,15 +106,15 @@ namespace LogicalConstructor
                 _saver.LoadData(ofd.FileName);
                 foreach (ElementClass element in _saver.Elements)
                 {
-                    ElementControl el=new ElementControl();
-
-                    el.Element = element;
+                    ElementControl el = new ElementControl {Element = element};
+                    Canvas.SetZIndex(el,_elementZIndex);
+                    _elementZIndex++;
                     el.UpdateView();
                     el.PreviewMouseMove += El_PreviewMouseMove;
                     el.SetLocation(element.Location);
                     MenuItem conntectionMenuItem =new MenuItem() { Header = "_Соединить элемент" };
                     conntectionMenuItem.Click += ConntectionMenuItem_Click;
-                    el.MainGrid.ContextMenu.Items.Insert(2, conntectionMenuItem);   
+                    el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
                     EditorCanvas.Children.Add(el);
                 }
             }
@@ -117,6 +133,8 @@ namespace LogicalConstructor
             _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
             EditorCanvas.Children.Remove(el);
         }
+
+
 
         ElementControl GetSelectedElement()
         {
