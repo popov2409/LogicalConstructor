@@ -22,9 +22,19 @@ namespace LogicalConstructor
     /// </summary>
     public partial class ElementControl : UserControl
     {
+        /// <summary>
+        /// Выделен ли контрол
+        /// </summary>
         public bool IsSelected;
-        public Point MousePoint;
+        
+        /// <summary>
+        /// Положение мыши относительно контрола(необходимо для правильного позиционирования при перетаскивании элемента)
+        /// </summary>
+        private Point _mousePoint;
         public ElementClass Element;
+        /// <summary>
+        /// Возможность перетаскивания
+        /// </summary>
         public bool IsDrag;
 
         public ElementControl()
@@ -33,6 +43,10 @@ namespace LogicalConstructor
             IsSelected = false;
         }
 
+        /// <summary>
+        /// Установить цвет линий всего содержимого
+        /// </summary>
+        /// <param name="brushes"></param>
         public void SetColor(Brush brushes)
         {
             Rectangle.Stroke = brushes;
@@ -49,6 +63,9 @@ namespace LogicalConstructor
             }
         }
 
+        /// <summary>
+        /// Выделение элемента
+        /// </summary>
         public void Selected()
         {
             IsSelected = true;
@@ -56,6 +73,9 @@ namespace LogicalConstructor
            // this.CaptureMouse();
         }
 
+        /// <summary>
+        /// Снятие выделения
+        /// </summary>
         public void Unselected()
         {
             IsSelected = false;
@@ -66,15 +86,18 @@ namespace LogicalConstructor
         private void ElementControl_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Selected();
-            MousePoint = e.GetPosition(this);
+            _mousePoint = e.GetPosition(this);
             IsDrag = true;
         }
 
 
-
+        /// <summary>
+        /// Задание положения элемента при создании или перемещении
+        /// </summary>
+        /// <param name="point"></param>
         public void SetLocation(Point point)
         {
-            Point resPoint = point - (Vector)MousePoint;
+            Point resPoint = point - (Vector)_mousePoint;
             Canvas.SetLeft(this,resPoint.X);
             Canvas.SetTop(this,resPoint.Y);
             Element.Location = resPoint;
@@ -87,6 +110,9 @@ namespace LogicalConstructor
             UpdateView();
         }
 
+        /// <summary>
+        /// Обновление контрола при изменении свойств элемента
+        /// </summary>
         public void UpdateView()
         {
             Ellipse.Visibility = Element.Type > 1 ? Visibility.Visible : Visibility.Hidden;
@@ -107,6 +133,11 @@ namespace LogicalConstructor
             }
         }
 
+        /// <summary>
+        /// Выделение части стыковки элемента
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void L_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             ((Line)sender).Stroke = Brushes.Crimson;

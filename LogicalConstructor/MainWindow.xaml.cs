@@ -24,9 +24,13 @@ namespace LogicalConstructor
     {
         private SaverClass _saver;
 
+        #region Переменные для определения порядка связей и элементов для отображения
+
         private int _connectionZIndex = 0;
 
         private int _elementZIndex = 10000;
+
+        #endregion
 
         private List<Connection> _connections;
         public MainWindow()
@@ -36,26 +40,88 @@ namespace LogicalConstructor
             _connections=new List<Connection>();
         }
 
-        public void AddConnection(ElementControl inControl, ElementControl outControl)
+        /// <summary>
+        /// Получение связи между двумя элементами для прорисовки линий
+        /// </summary>
+        /// <param name="inControl"></param>
+        /// <param name="outControl"></param>
+        /// <returns></returns>
+        public Connection GetConnectionByTwoControls(ElementControl inControl, ElementControl outControl)
         {
+
             Point p1 = new Point(Canvas.GetLeft(inControl) + inControl.Width / 2,
                 Canvas.GetTop(inControl) + inControl.Height / 2);
-            Point p2 = new Point(Canvas.GetLeft(outControl) + outControl.Width / 2,
+            Point p4 = new Point(Canvas.GetLeft(outControl) + outControl.Width / 2,
                 Canvas.GetTop(outControl) + outControl.Height / 2);
-            Polyline polyline=new Polyline(){Stroke = Brushes.Black};
-            Connection connection=new Connection(){};
+            //if (p1.X > p4.X)
+            //{
+            //    Point pp = p1;
+            //    p1 = p4;
+            //    p4 = pp;
+            //}
+
+            Point p2=new Point((p4.X-p1.X)/2+p1.X, (p1.Y));
+            Point p3 = new Point((p4.X - p1.X) / 2+p1.X, (p4.Y));
+
+            PointCollection pointCollection = new PointCollection(){p1, p2,p3,p4};
+            Polyline polyline = new Polyline()
+            {
+                Stroke = Brushes.Black, StrokeThickness = 2, Points = pointCollection,
+                HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top
+            };
+            Panel.SetZIndex(polyline,_connectionZIndex);
+            _connectionZIndex++;
+            Connection connection=new Connection()
+            {
+                In = inControl.Element.Id,
+                Out = outControl.Element.Id,
+                Line = polyline
+            };
+            return connection;
+        }
+
+        /// <summary>
+        /// Получить контрол по id элемента
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ElementControl GetElementById(Guid id)
+        {
+            foreach (UIElement child in EditorCanvas.Children)
+            {
+                if (child is ElementControl control)
+                {
+                    if (control.Element.Id == id) return control;
+
+                }
+            }
+            return null;
         }
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            ElementControl el=new ElementControl();
-            ElementClass element=new ElementClass(){Type = 2,InCount = 1};
+            EditorCanvas.Children.Add(AddNewElementControl());
+        }
+
+        /// <summary>
+        /// Создание нового элемента
+        /// </summary>
+        /// <returns></returns>
+        ElementControl AddNewElementControl()
+        {
+            ElementControl el = new ElementControl();
+            Panel.SetZIndex(el,_elementZIndex);
+            _elementZIndex++;
+            ElementClass element = new ElementClass() { Type = 2, InCount = 1 };
             el.Element = element;
             el.UpdateView();
             el.PreviewMouseMove += El_PreviewMouseMove;
             el.SetLocation(_mousePoint);
-            EditorCanvas.Children.Add(el);
+            MenuItem conntectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
+            conntectionMenuItem.Click += ConntectionMenuItem_Click;
+            el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
             _saver.Elements.Add(element);
+            return el;
         }
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -65,6 +131,9 @@ namespace LogicalConstructor
             ((ElementControl) sender).SetLocation(e.GetPosition(EditorCanvas));
         }
 
+        /// <summary>
+        /// Снять выделения со всех элементов
+        /// </summary>
         void ClearAllSelection()
         {
             foreach (UIElement child in EditorCanvas.Children)
@@ -99,6 +168,15 @@ namespace LogicalConstructor
 
         private void OpenItem_OnClick(object sender, RoutedEventArgs e)
         {
+            OpenSchema();
+        }
+
+
+        /// <summary>
+        /// Загрузка схемы
+        /// </summary>
+        void OpenSchema()
+        {
             OpenFileDialog ofd = new OpenFileDialog() { Title = "Выберите файл", Filter = "json files (*.json)|*.json" };
             if (ofd.ShowDialog() == true)
             {
@@ -106,18 +184,19 @@ namespace LogicalConstructor
                 _saver.LoadData(ofd.FileName);
                 foreach (ElementClass element in _saver.Elements)
                 {
-                    ElementControl el = new ElementControl {Element = element};
-                    Canvas.SetZIndex(el,_elementZIndex);
+                    ElementControl el = new ElementControl { Element = element };
+                    Panel.SetZIndex(el, _elementZIndex);
                     _elementZIndex++;
                     el.UpdateView();
                     el.PreviewMouseMove += El_PreviewMouseMove;
                     el.SetLocation(element.Location);
-                    MenuItem conntectionMenuItem =new MenuItem() { Header = "_Соединить элемент" };
+                    MenuItem conntectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
                     conntectionMenuItem.Click += ConntectionMenuItem_Click;
                     el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
                     EditorCanvas.Children.Add(el);
                 }
             }
+
         }
 
         private bool _connectionMode = false;
@@ -128,6 +207,10 @@ namespace LogicalConstructor
             _idSource = GetSelectedElement().Element.Id;
         }
 
+        /// <summary>
+        /// Удаление элемента
+        /// </summary>
+        /// <param name="el"></param>
         void RemoveElement(ElementControl el)
         {
             _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
@@ -135,7 +218,10 @@ namespace LogicalConstructor
         }
 
 
-
+        /// <summary>
+        /// Получниение выделенного элемента (через костыли)
+        /// </summary>
+        /// <returns></returns>
         ElementControl GetSelectedElement()
         {
             foreach (UIElement child in EditorCanvas.Children)
@@ -164,6 +250,9 @@ namespace LogicalConstructor
             }
         }
 
+        /// <summary>
+        /// Связывание элементов
+        /// </summary>
         void SetConnection()
         {
             ElementControl el = GetSelectedElement();
@@ -187,7 +276,9 @@ namespace LogicalConstructor
                 return;
             }
             _saver.Elements.First(c=>c.Id==el.Element.Id).InElements.Add(_idSource);
-            MessageBox.Show("Связь добавлена!");
+            EditorCanvas.Children.Add(GetConnectionByTwoControls(GetElementById(_idSource), el).Line);
+
+            //MessageBox.Show("Связь добавлена!");
             _connectionMode = false;
         }
 
