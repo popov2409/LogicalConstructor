@@ -31,6 +31,8 @@ namespace LogicalConstructor.DbProxy
         {
             Id=Guid.NewGuid();
             InElements=new List<Guid>();
+            Type = 2;
+            InCount = 1;
 
         }
 

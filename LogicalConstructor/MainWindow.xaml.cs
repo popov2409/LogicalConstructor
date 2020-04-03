@@ -32,61 +32,18 @@ namespace LogicalConstructor
             _connections=new List<Connection>();
         }
 
-        /// <summary>
-        /// Получение связи между двумя элементами для прорисовки линий
-        /// </summary>
-        /// <param name="inControl"></param>
-        /// <param name="outControl"></param>
-        /// <returns></returns>
-        public Connection GetConnectionByTwoControls(ElementControl inControl, ElementControl outControl)
-        {
-
-            
-            Polyline polyline = new Polyline()
-            {
-                Stroke = Brushes.Black, StrokeThickness = 2, Points = GraphClass.GetPointCollectionBetweenTwoElements(inControl,outControl),
-                HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top
-            };
-            Panel.SetZIndex(polyline,GraphClass.ConnectionZIndex++);
-            Connection connection=new Connection()
-            {
-                In = inControl.Element.Id,
-                Out = outControl.Element.Id,
-                Line = polyline
-            };
-            return connection;
-        }
-
-
         
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            ElementControl el = GraphClass.CreateElementControl(_mousePoint, ConntectionMenuItem_Click);
+            ElementClass element=new ElementClass(){Location = _mousePoint};
+            ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
+            //el.SetLocation(_mousePoint);
             el.PreviewMouseMove += El_PreviewMouseMove;
-            _saver.Elements.Add(el.Element);
+            _saver.Elements.Add(element);
             EditorCanvas.Children.Add(el);
         }
 
-        ///// <summary>
-        ///// Создание нового элемента
-        ///// </summary>
-        ///// <returns></returns>
-        //ElementControl AddNewElementControl()
-        //{
-        //    ElementControl el = new ElementControl();
-        //    Panel.SetZIndex(el,GraphClass.ElementZIndex++);
-        //    ElementClass element = new ElementClass() { Type = 2, InCount = 1 };
-        //    el.Element = element;
-        //    el.UpdateView();
-        //    el.PreviewMouseMove += El_PreviewMouseMove;
-        //    el.SetLocation(_mousePoint);
-        //    MenuItem conntectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
-        //    conntectionMenuItem.Click += ConntectionMenuItem_Click;
-        //    el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
-        //    _saver.Elements.Add(element);
-        //    return el;
-        //}
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -134,17 +91,20 @@ namespace LogicalConstructor
             {
                 EditorCanvas.Children.Clear();
                 _saver.LoadData(ofd.FileName);
+                GraphClass.ElementZIndex = 10000;
+                GraphClass.ConnectionZIndex = 0;
                 foreach (ElementClass element in _saver.Elements)
                 {
-                    ElementControl el = new ElementControl { Element = element };
-                    Panel.SetZIndex(el, GraphClass.ElementZIndex++);
-                    el.UpdateView();
+                    ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
                     el.PreviewMouseMove += El_PreviewMouseMove;
-                    el.SetLocation(element.Location);
-                    MenuItem conntectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
-                    conntectionMenuItem.Click += ConntectionMenuItem_Click;
-                    el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
                     EditorCanvas.Children.Add(el);
+                    foreach (Guid id in element.InElements)
+                    {
+                        Connection connection =
+                            GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == id), element);
+
+                        EditorCanvas.Children.Add(connection.Line);
+                    }
                 }
             }
 
@@ -167,9 +127,6 @@ namespace LogicalConstructor
             _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
             EditorCanvas.Children.Remove(el);
         }
-
-
-        
 
         private void EditorCanvas_OnPreviewKeyUp(object sender, KeyEventArgs e)
         {
@@ -210,7 +167,12 @@ namespace LogicalConstructor
                 return;
             }
             _saver.Elements.First(c=>c.Id==el.Element.Id).InElements.Add(_idSource);
-            EditorCanvas.Children.Add(GetConnectionByTwoControls(GraphClass.GetElementById(_idSource,EditorCanvas), el).Line);
+            //Connection connection =
+            //    GraphClass.GetConnectionByTwoControls(GraphClass.GetElementById(_idSource, EditorCanvas), el);
+            Connection connection =
+                GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == _idSource), el.Element);
+
+            EditorCanvas.Children.Add(connection.Line);
             _connectionMode = false;
         }
 

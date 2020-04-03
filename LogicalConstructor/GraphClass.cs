@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using LogicalConstructor.DbProxy;
-using Microsoft.Win32;
 
 namespace LogicalConstructor
 {
@@ -17,10 +17,11 @@ namespace LogicalConstructor
         /// Формирует коллекцию точек для связи между двумя элементами
         /// </summary>
         /// <returns></returns>
-        public static PointCollection GetPointCollectionBetweenTwoElements(ElementControl inControl, ElementControl outControl)
+        public static PointCollection GetPointCollectionBetweenTwoElements(ElementClass inControl, ElementClass outControl)
         {
-            Point p1 = new Point(Canvas.GetLeft(inControl) + Math.Truncate(inControl.Width / 2),
-                Canvas.GetTop(inControl) + Math.Truncate(inControl.Height / 2));
+            ElementControl control=new ElementControl();
+            Point p1 = new Point(inControl.Location.X + Math.Truncate(control.Width / 2),
+                inControl.Location.Y + Math.Truncate(control.Height / 2));
             Point p6 = GetPointConnection(outControl);
             Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
             Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
@@ -45,15 +46,15 @@ namespace LogicalConstructor
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        static Point GetPointConnection(ElementControl element)
+        static Point GetPointConnection(ElementClass element)
         {
+            ElementControl control=new ElementControl();
+            var dCon = control.Height / element.InCount / 2;
 
-            var dCon = element.Height / element.Element.InCount / 2;
+            Point point = new Point(element.Location.X + Math.Truncate(control.Width / 2),
+                element.Location.Y + dCon);
 
-            Point point = new Point(Canvas.GetLeft(element) + Math.Truncate(element.Width / 2),
-                Canvas.GetTop(element) + dCon);
-
-            for (int i = 1; i < element.Element.InElements.Count; i++)
+            for (int i = 1; i < element.InElements.Count; i++)
             {
                 point.Y += dCon * 2;
             }
@@ -80,17 +81,9 @@ namespace LogicalConstructor
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static ElementControl GetElementById(Guid id,Canvas canvas)
+        public static ElementClass GetElementById(Guid id,SaverClass saver)
         {
-            foreach (UIElement child in canvas.Children)
-            {
-                if (child is ElementControl control)
-                {
-                    if (control.Element.Id == id) return control;
-
-                }
-            }
-            return null;
+            return saver.Elements.First(c => c.Id == id);
         }
 
         /// <summary>
@@ -117,21 +110,46 @@ namespace LogicalConstructor
         /// Создание нового элемента
         /// </summary>
         /// <returns></returns>
-        public static ElementControl CreateElementControl(Point mousePoint,RoutedEventHandler menuHandler)
+        public static ElementControl CreateElementControl(ElementClass element,RoutedEventHandler menuHandler)
         {
             ElementControl el = new ElementControl();
             Panel.SetZIndex(el, GraphClass.ElementZIndex++);
-            ElementClass element = new ElementClass() { Type = 2, InCount = 1 };
             el.Element = element;
             el.UpdateView();
-            el.SetLocation(mousePoint);
+            el.SetLocation(element.Location);
             MenuItem conntectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
             conntectionMenuItem.Click += menuHandler;
             el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
             return el;
         }
 
+        /// <summary>
+        /// Получение связи между двумя элементами для прорисовки линий
+        /// </summary>
+        /// <param name="inControl"></param>
+        /// <param name="outControl"></param>
+        /// <returns></returns>
+        public static Connection GetConnectionByTwoControls(ElementClass inControl, ElementClass outControl)
+        {
 
+
+            Polyline polyline = new Polyline()
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+                Points = GraphClass.GetPointCollectionBetweenTwoElements(inControl, outControl),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            Panel.SetZIndex(polyline, ConnectionZIndex++);
+            Connection connection = new Connection()
+            {
+                In = inControl.Id,
+                Out = outControl.Id,
+                Line = polyline
+            };
+            return connection;
+        }
 
 
         /// <summary>
