@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace LogicalConstructor.DbProxy
 {
-    public class ElementClass
+    public class ElementClass : IDisposable
     {
         public Guid Id { get; set; }
         public Point Location { get; set; }
@@ -38,19 +38,21 @@ namespace LogicalConstructor.DbProxy
 
         }
 
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class Connection
     {
-        public Guid Start { get; set; }
-        public Guid End { get; set; }
-        //public Point StartPoint { get; set; }
-        //public Point EndPoint { get; set; }
+        public ElementClass Start { get; set; }
+        public ElementClass Finish { get; set; }
         public Polyline Line { get; set; }
 
         public Connection()
         {
-            Line=new Polyline()
+            Line = new Polyline()
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
@@ -60,19 +62,52 @@ namespace LogicalConstructor.DbProxy
             Line.PreviewMouseDown += Line_PreviewMouseDown;
         }
 
+
+        Point GetFinishPoint()
+        {
+            ElementControl control = new ElementControl();
+            var dCon = control.Height / Finish.InCount / 2;
+            int number = Finish.InElements.IndexOf(Start.Id)+1;
+
+            Point point = new Point(Finish.Location.X + control.Width / 2,
+                Finish.Location.Y + dCon);
+
+            for (int i = 0; i < number-1; i++)
+            {
+                point.Y += dCon * 2;
+            }
+            //if (number > 1) point.Y += dCon * number;
+            return point;
+        }
+
+
+        public void CalculatePoints()
+        {
+            ElementControl control = new ElementControl();
+            Point p1 = new Point(Start.Location.X + Math.Truncate(control.Width / 2), Start.Location.Y + control.Height / 2);
+            Point p6 = GetFinishPoint();
+            Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
+            Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
+            Point p4 = p3;
+            Point p5 = p3;
+
+
+            if (p1.X >= p4.X + 10)
+            {
+                p2 = new Point(p1.X + 40, p1.Y);
+                var dY = (p1.Y - p6.Y) / 2;
+                p3 = new Point(p2.X, p1.Y - dY);
+                p4 = new Point(p6.X - 40, p3.Y);
+                p5 = new Point(p4.X, p6.Y);
+            }
+
+            Line.Points= new PointCollection() { p1, p2, p3, p4, p5, p6 };
+        }
+
+
         private void Line_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            Selected();
-        }
-
-        public void Selected()
-        {
             Line.Stroke = Brushes.Blue;
-        }
-
-        public void Unselected()
-        {
-            Line.Stroke = Brushes.Black;
         }
     }
 }

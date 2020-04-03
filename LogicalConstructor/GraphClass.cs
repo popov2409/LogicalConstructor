@@ -13,33 +13,33 @@ namespace LogicalConstructor
 {
     public static class GraphClass
     {
-        /// <summary>
-        /// Формирует коллекцию точек для связи между двумя элементами
-        /// </summary>
-        /// <returns></returns>
-        public static PointCollection GetPointCollectionBetweenTwoElements(ElementClass startElement, ElementClass finishElement,int numConnection)
-        {
-            ElementControl control=new ElementControl();
-            Point p1 = new Point(startElement.Location.X + Math.Truncate(control.Width / 2),
-                startElement.Location.Y + Math.Truncate(control.Height / 2));
-            Point p6 = GetFinishPoint(finishElement,numConnection);
-            Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
-            Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
-            Point p4 = p3;
-            Point p5 = p3;
+        ///// <summary>
+        ///// Формирует коллекцию точек для связи между двумя элементами
+        ///// </summary>
+        ///// <returns></returns>
+        //public static PointCollection GetPointCollectionBetweenTwoElements(ElementClass startElement, ElementClass finishElement,int numConnection)
+        //{
+        //    ElementControl control=new ElementControl();
+        //    Point p1 = new Point(startElement.Location.X + Math.Truncate(control.Width / 2),
+        //        startElement.Location.Y + Math.Truncate(control.Height / 2));
+        //    Point p6 = GetFinishPoint(finishElement,numConnection);
+        //    Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
+        //    Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
+        //    Point p4 = p3;
+        //    Point p5 = p3;
 
 
-            if (p1.X >= p4.X + 10)
-            {
-                p2 = new Point(p1.X + 40, p1.Y);
-                var dY = (p1.Y - p6.Y) / 2;
-                p3 = new Point(p2.X, p1.Y - dY);
-                p4 = new Point(p6.X - 40, p3.Y);
-                p5 = new Point(p4.X, p6.Y);
-            }
+        //    if (p1.X >= p4.X + 10)
+        //    {
+        //        p2 = new Point(p1.X + 40, p1.Y);
+        //        var dY = (p1.Y - p6.Y) / 2;
+        //        p3 = new Point(p2.X, p1.Y - dY);
+        //        p4 = new Point(p6.X - 40, p3.Y);
+        //        p5 = new Point(p4.X, p6.Y);
+        //    }
 
-            return new PointCollection() { p1, p2, p3, p4, p5, p6 };
-        }
+        //    return new PointCollection() { p1, p2, p3, p4, p5, p6 };
+        //}
 
         /// <summary>
         /// Получить координату конечной точки связи в зависимости от колличества входов и их занятости
@@ -135,24 +135,28 @@ namespace LogicalConstructor
             return el;
         }
 
-        /// <summary>
-        /// Получение связи между двумя элементами для прорисовки линий
-        /// </summary>
-        /// <param name="startElement"></param>
-        /// <param name="finishElement"></param>
-        /// <returns></returns>
-        public static Connection GetConnectionByTwoControls(ElementClass startElement, ElementClass finishElement, int numberConnection)
-        {
-            Connection connection = new Connection()
-            {
-                Start = startElement.Id,
-                End = finishElement.Id,
-            };
-            connection.Line.Points =
-                GetPointCollectionBetweenTwoElements(startElement, finishElement, numberConnection);
-            Panel.SetZIndex(connection.Line, ConnectionZIndex++);
-            return connection;
-        }
+        ///// <summary>
+        ///// Получение связи между двумя элементами для прорисовки линий
+        ///// </summary>
+        ///// <param name="startElement"></param>
+        ///// <param name="finishElement"></param>
+        ///// <returns></returns>
+        //public static Connection GetConnectionByTwoControls(ElementClass startElement, ElementClass finishElement, string numberConnection)
+        //{
+        //    ElementControl control=new ElementControl();
+        //    Connection connection = new Connection()
+        //    {
+        //        Start = startElement.Id,
+        //        Finish = finishElement.Id,
+        //        StartPoint = startElement.Location,
+        //        FinishPoint = finishElement.Location,
+        //        Number = numberConnection
+                
+        //    };
+        //    connection.CalculatePoints();
+        //    Panel.SetZIndex(connection.Line, ConnectionZIndex++);
+        //    return connection;
+        //}
 
 
 

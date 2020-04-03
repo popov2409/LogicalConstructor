@@ -127,6 +127,7 @@ namespace LogicalConstructor
                     Stroke = Brushes.Black, StrokeThickness = 2, X1 = 0, X2 = 10, Y1 = 0, Y2 = 0,
                     VerticalAlignment = VerticalAlignment.Center
                 };
+                l.Visibility = (i < Element.InElements.Count) ? Visibility.Hidden : Visibility.Visible;
                 l.PreviewMouseDown += L_PreviewMouseDown;
                 Grid.SetRow(l,i);
                 InGrid.Children.Add(l);

@@ -38,7 +38,6 @@ namespace LogicalConstructor
         {
             ElementClass element=new ElementClass(){Location = _mousePoint};
             ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
-            //el.SetLocation(_mousePoint);
             el.PreviewMouseMove += El_PreviewMouseMove;
             _saver.Elements.Add(element);
             EditorCanvas.Children.Add(el);
@@ -47,9 +46,17 @@ namespace LogicalConstructor
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (!((ElementControl) sender).IsSelected) return;
-            if(!((ElementControl)sender).IsDrag) return;
-            ((ElementControl) sender).SetLocation(e.GetPosition(EditorCanvas));
+            ElementControl element=sender as ElementControl;
+            if (!element.IsSelected) return;
+            if(!element.IsDrag) return;
+            element.SetLocation(e.GetPosition(EditorCanvas));
+
+            foreach (Connection connection in _connections
+                .Where(c => c.Start.Id == element.Element.Id || c.Finish.Id == element.Element.Id).ToList())
+            {
+                connection.CalculatePoints();
+            }
+
         }
 
         
@@ -90,6 +97,7 @@ namespace LogicalConstructor
             if (ofd.ShowDialog() == true)
             {
                 EditorCanvas.Children.Clear();
+                _connections.Clear();
                 _saver.LoadData(ofd.FileName);
                 GraphClass.ElementZIndex = 10000;
                 GraphClass.ConnectionZIndex = 0;
@@ -98,13 +106,16 @@ namespace LogicalConstructor
                     ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
                     el.PreviewMouseMove += El_PreviewMouseMove;
                     EditorCanvas.Children.Add(el);
-                    int i = 0;
                     foreach (Guid id in element.InElements)
                     {
-                        i++;
-                        Connection connection =
-                            GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == id), el.Element,i);
-
+                        Connection connection = new Connection()
+                        {
+                            Start = _saver.Elements.First(c => c.Id == id),
+                            Finish = el.Element
+                        };
+                        connection.CalculatePoints();
+                        Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
+                        _connections.Add(connection);
                         EditorCanvas.Children.Add(connection.Line);
                     }
                 }
@@ -168,13 +179,17 @@ namespace LogicalConstructor
                 _connectionMode = false;
                 return;
             }
-            _saver.Elements.First(c=>c.Id==el.Element.Id).InElements.Add(_idSource);
-            //Connection connection =
-            //    GraphClass.GetConnectionByTwoControls(GraphClass.GetElementById(_idSource, EditorCanvas), el);
-            Connection connection =
-                GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == _idSource), el.Element,0);
 
+            _saver.Elements.First(c => c.Id == el.Element.Id).InElements.Add(_idSource);
+            Connection connection = new Connection()
+            {
+                Start = _saver.Elements.First(c => c.Id == _idSource),
+                Finish = el.Element
+            };
+            Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
+            connection.CalculatePoints();
             EditorCanvas.Children.Add(connection.Line);
+            _connections.Add(connection);
             _connectionMode = false;
         }
 
