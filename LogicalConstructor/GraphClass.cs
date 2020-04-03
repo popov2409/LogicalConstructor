@@ -17,12 +17,12 @@ namespace LogicalConstructor
         /// Формирует коллекцию точек для связи между двумя элементами
         /// </summary>
         /// <returns></returns>
-        public static PointCollection GetPointCollectionBetweenTwoElements(ElementClass inControl, ElementClass outControl)
+        public static PointCollection GetPointCollectionBetweenTwoElements(ElementClass startElement, ElementClass finishElement,int numConnection)
         {
             ElementControl control=new ElementControl();
-            Point p1 = new Point(inControl.Location.X + Math.Truncate(control.Width / 2),
-                inControl.Location.Y + Math.Truncate(control.Height / 2));
-            Point p6 = GetPointConnection(outControl);
+            Point p1 = new Point(startElement.Location.X + Math.Truncate(control.Width / 2),
+                startElement.Location.Y + Math.Truncate(control.Height / 2));
+            Point p6 = GetFinishPoint(finishElement,numConnection);
             Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
             Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
             Point p4 = p3;
@@ -46,7 +46,7 @@ namespace LogicalConstructor
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        static Point GetPointConnection(ElementClass element)
+        static Point GetFinishPoint(ElementClass element, int numConnection)
         {
             ElementControl control=new ElementControl();
             var dCon = control.Height / element.InCount / 2;
@@ -54,10 +54,18 @@ namespace LogicalConstructor
             Point point = new Point(element.Location.X + Math.Truncate(control.Width / 2),
                 element.Location.Y + dCon);
 
-            for (int i = 1; i < element.InElements.Count; i++)
+            if (numConnection > 0)
             {
-                point.Y += dCon * 2;
+                if (numConnection > 1) point.Y += dCon * numConnection;
             }
+            else
+            {
+                for (int i = 1; i < element.InElements.Count; i++)
+                {
+                    point.Y += dCon * 2;
+                }
+            }
+
 
             return point;
         }
@@ -72,6 +80,10 @@ namespace LogicalConstructor
                 if (child is ElementControl control)
                 {
                     control.Unselected();
+                }
+                if (child is Polyline polyline)
+                {
+                    polyline.Stroke = Brushes.Black;
                 }
             }
         }
@@ -126,30 +138,22 @@ namespace LogicalConstructor
         /// <summary>
         /// Получение связи между двумя элементами для прорисовки линий
         /// </summary>
-        /// <param name="inControl"></param>
-        /// <param name="outControl"></param>
+        /// <param name="startElement"></param>
+        /// <param name="finishElement"></param>
         /// <returns></returns>
-        public static Connection GetConnectionByTwoControls(ElementClass inControl, ElementClass outControl)
+        public static Connection GetConnectionByTwoControls(ElementClass startElement, ElementClass finishElement, int numberConnection)
         {
-
-
-            Polyline polyline = new Polyline()
-            {
-                Stroke = Brushes.Black,
-                StrokeThickness = 2,
-                Points = GraphClass.GetPointCollectionBetweenTwoElements(inControl, outControl),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-            Panel.SetZIndex(polyline, ConnectionZIndex++);
             Connection connection = new Connection()
             {
-                In = inControl.Id,
-                Out = outControl.Id,
-                Line = polyline
+                Start = startElement.Id,
+                End = finishElement.Id,
             };
+            connection.Line.Points =
+                GetPointCollectionBetweenTwoElements(startElement, finishElement, numberConnection);
+            Panel.SetZIndex(connection.Line, ConnectionZIndex++);
             return connection;
         }
+
 
 
         /// <summary>

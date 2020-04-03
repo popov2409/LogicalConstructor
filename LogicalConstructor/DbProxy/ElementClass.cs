@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace LogicalConstructor.DbProxy
@@ -38,13 +40,39 @@ namespace LogicalConstructor.DbProxy
 
     }
 
-    public struct Connection
+    public class Connection
     {
-        public Guid In { get; set; }
-        public Guid Out { get; set; }
+        public Guid Start { get; set; }
+        public Guid End { get; set; }
         //public Point StartPoint { get; set; }
         //public Point EndPoint { get; set; }
         public Polyline Line { get; set; }
 
+        public Connection()
+        {
+            Line=new Polyline()
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            Line.PreviewMouseDown += Line_PreviewMouseDown;
+        }
+
+        private void Line_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Selected();
+        }
+
+        public void Selected()
+        {
+            Line.Stroke = Brushes.Blue;
+        }
+
+        public void Unselected()
+        {
+            Line.Stroke = Brushes.Black;
+        }
     }
 }

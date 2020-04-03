@@ -98,10 +98,12 @@ namespace LogicalConstructor
                     ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
                     el.PreviewMouseMove += El_PreviewMouseMove;
                     EditorCanvas.Children.Add(el);
+                    int i = 0;
                     foreach (Guid id in element.InElements)
                     {
+                        i++;
                         Connection connection =
-                            GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == id), element);
+                            GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == id), el.Element,i);
 
                         EditorCanvas.Children.Add(connection.Line);
                     }
@@ -170,7 +172,7 @@ namespace LogicalConstructor
             //Connection connection =
             //    GraphClass.GetConnectionByTwoControls(GraphClass.GetElementById(_idSource, EditorCanvas), el);
             Connection connection =
-                GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == _idSource), el.Element);
+                GraphClass.GetConnectionByTwoControls(_saver.Elements.First(c => c.Id == _idSource), el.Element,0);
 
             EditorCanvas.Children.Add(connection.Line);
             _connectionMode = false;
