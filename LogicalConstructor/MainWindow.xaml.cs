@@ -32,7 +32,22 @@ namespace LogicalConstructor
             _connections=new List<Connection>();
         }
 
-        
+
+        void InitializeOutControl()
+        {
+            if (_saver.Elements.Count(c => c.Type == 11) > 0) return;
+            ElementClass element = new ElementClass {Type = 11, InCount = 1};
+            _saver.Elements.Add(element);
+            InOutControl outControl = new InOutControl()
+            {
+                Element = element,
+                NameLabel = {Text = "Y"}
+                
+            };
+            outControl.SetLocation(new Point(EditorCanvas.ActualWidth - 40, EditorCanvas.ActualHeight / 2 - 50));
+
+            EditorCanvas.Children.Add(outControl);
+        }
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
@@ -47,10 +62,8 @@ namespace LogicalConstructor
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             ElementControl element=sender as ElementControl;
-            if (!element.IsSelected) return;
-            if(!element.IsDrag) return;
+            if (sender as ElementControl == null || !element.IsSelected || !element.IsDrag) return;
             element.SetLocation(e.GetPosition(EditorCanvas));
-
             foreach (Connection connection in _connections
                 .Where(c => c.Start.Id == element.Element.Id || c.Finish.Id == element.Element.Id).ToList())
             {
@@ -197,6 +210,33 @@ namespace LogicalConstructor
         {
             if (!_connectionMode) return;
             SetConnection();
+        }
+
+        private void AddInOutMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            InOutControl control = new InOutControl
+            {
+                NameLabel = {Text = $"X{_saver.Elements.Count(c => c.Type == 10)}"}
+            };
+            ElementClass element = new ElementClass() {InCount = 0, Type = 10};
+            control.Element = element;
+            _saver.Elements.Add(element);
+            EditorCanvas.Children.Add(control);
+            UpdateViewInOut();
+            InitializeOutControl();
+
+        }
+
+        void UpdateViewInOut()
+        {
+            var dEl = (EditorCanvas.ActualHeight-50) / _saver.Elements.Count(c => c.Type == 10)/2;
+            Point startPoint = new Point(20, dEl);
+
+            foreach (InOutControl inControl in EditorCanvas.Children.OfType<InOutControl>().Where(c=>c.Element.Type==10))
+            {
+                inControl.SetLocation(startPoint);
+                startPoint.Y += 2 * dEl;
+            }
         }
     }
 }

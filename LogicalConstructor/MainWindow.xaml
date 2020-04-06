@@ -32,11 +32,12 @@
         <Canvas Name="EditorCanvas" Grid.Row="1" Background="#FFF7F8D3" PreviewMouseDown="EditorCanvas_OnPreviewMouseDown" >
             <Canvas.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Name="AddInOutMenuItem" Header="_Добавить вход" Click="AddInOutMenuItem_OnClick"></MenuItem>
                     <MenuItem Name="AddElementMenuItem"  Header="_Добавить элемент"  Click="AddElementMenuItem_OnClick"/>
                 </ContextMenu>
             </Canvas.ContextMenu>
-            
         </Canvas>
+        <!--<Rectangle Grid.Row="1" Name="InRectangle"  HorizontalAlignment="Left" Width="30" StrokeThickness="1" Stroke="Black" StrokeDashArray="1 1"/>-->
 
     </Grid>
 </Window>

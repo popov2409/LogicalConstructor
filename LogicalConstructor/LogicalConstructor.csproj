@@ -86,10 +86,17 @@
     <Compile Include="DbProxy\ElementClass.cs" />
     <Compile Include="DbProxy\SaverClass.cs" />
     <Compile Include="GraphClass.cs" />
+    <Compile Include="InOutControl.xaml.cs">
+      <DependentUpon>InOutControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ElementProperty.xaml.cs">
       <DependentUpon>ElementProperty.xaml</DependentUpon>
     </Compile>
     <Page Include="ElementControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InOutControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

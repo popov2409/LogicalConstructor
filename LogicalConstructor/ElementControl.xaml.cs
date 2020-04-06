@@ -37,10 +37,22 @@ namespace LogicalConstructor
         /// </summary>
         public bool IsDrag;
 
+        private Dictionary<int, string> _names;
         public ElementControl()
         {
             InitializeComponent();
             IsSelected = false;
+            InitializeDictionary();
+        }
+
+        void InitializeDictionary()
+        {
+            _names=new Dictionary<int, string>();
+            _names.Add(0,"И");
+            _names.Add(1, "ИЛИ");
+            _names.Add(2, "НЕ");
+            _names.Add(3, "И-НЕ");
+            _names.Add(4, "ИЛИ-НЕ");
         }
 
         /// <summary>
@@ -116,7 +128,7 @@ namespace LogicalConstructor
         public void UpdateView()
         {
             Ellipse.Visibility = Element.Type > 1 ? Visibility.Visible : Visibility.Hidden;
-            ElementName.Content = (Element.Type == 0 || Element.Type == 3) ? "&" : "1";
+            ElementName.Text = (Element.Type == 0 || Element.Type == 3) ? "&" : "1";
             InGrid.Children.Clear();
             InGrid.RowDefinitions.Clear();
             for (int i = 0; i < Element.InCount; i++)
