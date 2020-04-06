@@ -244,7 +244,7 @@ namespace LogicalConstructor
                 Type = 11,
                 InCount = 1,
                 Name = "Y",
-                Location = new Point(EditorCanvas.ActualWidth - 26, EditorCanvas.ActualHeight / 2 - 50)
+                Location = new Point(EditorCanvas.ActualWidth - 40, EditorCanvas.ActualHeight / 2 - 50)
             };
             SaverClass.Elements.Add(element);
             EditorCanvas.Children.Add(GraphClass.CreateOutControl(element));

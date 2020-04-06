@@ -63,14 +63,37 @@ namespace LogicalConstructor.DbProxy
             Line.PreviewMouseDown += Line_PreviewMouseDown;
         }
 
+        Point GetStartPoint()
+        {
+            ElementControl control = new ElementControl();
+            double width = control.Width;
+            double height = control.Height;
+            if (Start.Type > 9)
+            {
+                width = new InOutControl().Width;
+                // height = 20;
+            }
+            Point point = new Point(Start.Location.X + Math.Truncate(width / 2),
+                Start.Location.Y + height / 2);
+            return point;
+        }
+
 
         Point GetFinishPoint()
         {
             ElementControl control = new ElementControl();
-            var dCon = control.Height / Finish.InCount / 2;
+            double width = control.Width;
+            double height = control.Height;
+            if (Finish.Type>9)
+            {
+                width = new InOutControl().Width;
+               // height = 20;
+            }
+
+            var dCon = height / Finish.InCount / 2;
             int number = Finish.InElements.IndexOf(Start.Id)+1;
 
-            Point point = new Point(Finish.Location.X + control.Width / 2,
+            Point point = new Point(Finish.Location.X + width / 2,
                 Finish.Location.Y + dCon);
 
             for (int i = 0; i < number-1; i++)
@@ -81,11 +104,11 @@ namespace LogicalConstructor.DbProxy
             return point;
         }
 
+        
 
         public void CalculatePoints()
         {
-            ElementControl control = new ElementControl();
-            Point p1 = new Point(Start.Location.X + Math.Truncate(control.Width / 2), Start.Location.Y + control.Height / 2);
+            Point p1 = GetStartPoint();
             Point p6 = GetFinishPoint();
             Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
             Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
