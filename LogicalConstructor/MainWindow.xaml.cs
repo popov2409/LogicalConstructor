@@ -22,31 +22,10 @@ namespace LogicalConstructor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SaverClass _saver;
 
-        private List<Connection> _connections;
         public MainWindow()
         {
             InitializeComponent();
-            _saver=new SaverClass();
-            _connections=new List<Connection>();
-        }
-
-
-        void InitializeOutControl()
-        {
-            if (_saver.Elements.Count(c => c.Type == 11) > 0) return;
-            ElementClass element = new ElementClass {Type = 11, InCount = 1};
-            _saver.Elements.Add(element);
-            InOutControl outControl = new InOutControl()
-            {
-                Element = element,
-                NameLabel = {Text = "Y"}
-                
-            };
-            outControl.SetLocation(new Point(EditorCanvas.ActualWidth - 40, EditorCanvas.ActualHeight / 2 - 50));
-
-            EditorCanvas.Children.Add(outControl);
         }
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -54,17 +33,16 @@ namespace LogicalConstructor
             ElementClass element=new ElementClass(){Location = _mousePoint};
             ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
             el.PreviewMouseMove += El_PreviewMouseMove;
-            _saver.Elements.Add(element);
+            SaverClass.Elements.Add(element);
             EditorCanvas.Children.Add(el);
         }
-
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             ElementControl element=sender as ElementControl;
             if (sender as ElementControl == null || !element.IsSelected || !element.IsDrag) return;
             element.SetLocation(e.GetPosition(EditorCanvas));
-            foreach (Connection connection in _connections
+            foreach (Connection connection in GraphClass.Connections
                 .Where(c => c.Start.Id == element.Element.Id || c.Finish.Id == element.Element.Id).ToList())
             {
                 connection.CalculatePoints();
@@ -72,12 +50,11 @@ namespace LogicalConstructor
 
         }
 
-        
-
         private Point _mousePoint;
         private void EditorCanvas_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            GraphClass.ClearAllSelection(EditorCanvas);
+            //GraphClass.ClearAllSelection(EditorCanvas);
+            GraphClass.ClearAllSelection();
             _mousePoint = e.GetPosition(EditorCanvas);
         }
 
@@ -91,7 +68,7 @@ namespace LogicalConstructor
             SaveFileDialog ofd = new SaveFileDialog() {Title = "Введите имя файла", Filter = "json files (*.json)|*.json" };
             if (ofd.ShowDialog() == true)
             {
-                _ = _saver.SaveData(ofd.FileName);
+                SaverClass.SaveData(ofd.FileName);
             }
         }
 
@@ -110,12 +87,26 @@ namespace LogicalConstructor
             if (ofd.ShowDialog() == true)
             {
                 EditorCanvas.Children.Clear();
-                _connections.Clear();
-                _saver.LoadData(ofd.FileName);
+                GraphClass.Connections.Clear();
+                SaverClass.LoadData(ofd.FileName);
                 GraphClass.ElementZIndex = 10000;
                 GraphClass.ConnectionZIndex = 0;
-                foreach (ElementClass element in _saver.Elements)
+                foreach (ElementClass element in SaverClass.Elements)
                 {
+                    switch (element.Type)
+                    {
+                        case 10:
+                        {
+                            EditorCanvas.Children.Add(GraphClass.CreateInControl(element));
+                            continue;
+                        }
+                        case 11:
+                        {
+                            EditorCanvas.Children.Add(GraphClass.CreateOutControl(element));
+                            continue;
+                        }
+                    }
+
                     ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
                     el.PreviewMouseMove += El_PreviewMouseMove;
                     EditorCanvas.Children.Add(el);
@@ -123,12 +114,12 @@ namespace LogicalConstructor
                     {
                         Connection connection = new Connection()
                         {
-                            Start = _saver.Elements.First(c => c.Id == id),
+                            Start = SaverClass.Elements.First(c => c.Id == id),
                             Finish = el.Element
                         };
                         connection.CalculatePoints();
                         Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
-                        _connections.Add(connection);
+                        GraphClass.Connections.Add(connection);
                         EditorCanvas.Children.Add(connection.Line);
                     }
                 }
@@ -141,7 +132,7 @@ namespace LogicalConstructor
         private void ConntectionMenuItem_Click(object sender, RoutedEventArgs e)
         {
             _connectionMode = true;
-            _idSource = GraphClass.GetSelectedElement(EditorCanvas).Element.Id;
+            _idSource = GraphClass.GetSelectedElement().Element.Id;
         }
 
         /// <summary>
@@ -150,7 +141,7 @@ namespace LogicalConstructor
         /// <param name="el"></param>
         void RemoveElement(ElementControl el)
         {
-            _saver.Elements.Remove(_saver.Elements.First(c => c.Id == el.Element.Id));
+            SaverClass.Elements.Remove(SaverClass.Elements.First(c => c.Id == el.Element.Id));
             EditorCanvas.Children.Remove(el);
         }
 
@@ -158,7 +149,7 @@ namespace LogicalConstructor
         {
             if (e.Key == Key.Delete)
             {
-                ElementControl el = GraphClass.GetSelectedElement(EditorCanvas);
+                ElementControl el = GraphClass.GetSelectedElement();
 
                 if (el == null) return;
                 if (MessageBox.Show("Вы действительно хотите удалить элемент?", "", MessageBoxButton.YesNo) !=
@@ -172,7 +163,7 @@ namespace LogicalConstructor
         /// </summary>
         void SetConnection()
         {
-            ElementControl el = GraphClass.GetSelectedElement(EditorCanvas);
+            ElementControl el = GraphClass.GetSelectedElement();
             if (el == null)
             {
                 _connectionMode = false;
@@ -193,16 +184,16 @@ namespace LogicalConstructor
                 return;
             }
 
-            _saver.Elements.First(c => c.Id == el.Element.Id).InElements.Add(_idSource);
+            SaverClass.Elements.First(c => c.Id == el.Element.Id).InElements.Add(_idSource);
             Connection connection = new Connection()
             {
-                Start = _saver.Elements.First(c => c.Id == _idSource),
+                Start = SaverClass.Elements.First(c => c.Id == _idSource),
                 Finish = el.Element
             };
             Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
             connection.CalculatePoints();
             EditorCanvas.Children.Add(connection.Line);
-            _connections.Add(connection);
+            GraphClass.Connections.Add(connection);
             _connectionMode = false;
         }
 
@@ -214,22 +205,34 @@ namespace LogicalConstructor
 
         private void AddInOutMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            InOutControl control = new InOutControl
-            {
-                NameLabel = {Text = $"X{_saver.Elements.Count(c => c.Type == 10)}"}
-            };
-            ElementClass element = new ElementClass() {InCount = 0, Type = 10};
-            control.Element = element;
-            _saver.Elements.Add(element);
-            EditorCanvas.Children.Add(control);
+            ElementClass element = new ElementClass() {InCount = 0, Type = 10,Name = $"X{SaverClass.Elements.Count(c => c.Type == 10)}" };
+            SaverClass.Elements.Add(element);
+            EditorCanvas.Children.Add(GraphClass.CreateInControl(element));
             UpdateViewInOut();
             InitializeOutControl();
 
         }
 
+        void InitializeOutControl()
+        {
+            if (SaverClass.Elements.Count(c => c.Type == 11) > 0) return;
+            ElementClass element = new ElementClass
+            {
+                Type = 11,
+                InCount = 1,
+                Name = "Y",
+                Location = new Point(EditorCanvas.ActualWidth - 40, EditorCanvas.ActualHeight / 2 - 50)
+            };
+            SaverClass.Elements.Add(element);
+            EditorCanvas.Children.Add(GraphClass.CreateOutControl(element));
+        }
+
+        /// <summary>
+        /// Обновить отображение входов при добавлении
+        /// </summary>
         void UpdateViewInOut()
         {
-            var dEl = (EditorCanvas.ActualHeight-50) / _saver.Elements.Count(c => c.Type == 10)/2;
+            var dEl = (EditorCanvas.ActualHeight-50) / SaverClass.Elements.Count(c => c.Type == 10)/2;
             Point startPoint = new Point(20, dEl);
 
             foreach (InOutControl inControl in EditorCanvas.Children.OfType<InOutControl>().Where(c=>c.Element.Type==10))

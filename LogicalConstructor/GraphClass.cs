@@ -13,34 +13,10 @@ namespace LogicalConstructor
 {
     public static class GraphClass
     {
-        ///// <summary>
-        ///// Формирует коллекцию точек для связи между двумя элементами
-        ///// </summary>
-        ///// <returns></returns>
-        //public static PointCollection GetPointCollectionBetweenTwoElements(ElementClass startElement, ElementClass finishElement,int numConnection)
-        //{
-        //    ElementControl control=new ElementControl();
-        //    Point p1 = new Point(startElement.Location.X + Math.Truncate(control.Width / 2),
-        //        startElement.Location.Y + Math.Truncate(control.Height / 2));
-        //    Point p6 = GetFinishPoint(finishElement,numConnection);
-        //    Point p2 = new Point((p6.X - p1.X) / 2 + p1.X, (p1.Y));
-        //    Point p3 = new Point((p6.X - p1.X) / 2 + p1.X, (p6.Y));
-        //    Point p4 = p3;
-        //    Point p5 = p3;
 
 
-        //    if (p1.X >= p4.X + 10)
-        //    {
-        //        p2 = new Point(p1.X + 40, p1.Y);
-        //        var dY = (p1.Y - p6.Y) / 2;
-        //        p3 = new Point(p2.X, p1.Y - dY);
-        //        p4 = new Point(p6.X - 40, p3.Y);
-        //        p5 = new Point(p4.X, p6.Y);
-        //    }
-
-        //    return new PointCollection() { p1, p2, p3, p4, p5, p6 };
-        //}
-
+        public static List<ElementControl> Elements=new List<ElementControl>();
+        public static List<Connection> Connections = new List<Connection>();
         /// <summary>
         /// Получить координату конечной точки связи в зависимости от колличества входов и их занятости
         /// </summary>
@@ -73,49 +49,27 @@ namespace LogicalConstructor
         /// <summary>
         /// Снять выделения со всех элементов
         /// </summary>
-        public static void ClearAllSelection(Canvas canvas)
+        public static void ClearAllSelection()
         {
-            foreach (UIElement child in canvas.Children)
+            foreach (ElementControl elementControl in Elements)
             {
-                if (child is ElementControl control)
-                {
-                    control.Unselected();
-                }
-                if (child is Polyline polyline)
-                {
-                    polyline.Stroke = Brushes.Black;
-                }
+                elementControl.UnSelected();
+            }
+
+            foreach (Connection connection in Connections)
+            {
+                connection.UnSelected();
             }
         }
 
-        /// <summary>
-        /// Получить контрол по id элемента
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public static ElementClass GetElementById(Guid id,SaverClass saver)
-        {
-            return saver.Elements.First(c => c.Id == id);
-        }
 
         /// <summary>
-        /// Получниение выделенного элемента (через костыли)
+        /// Получниение выделенного элемента
         /// </summary>
         /// <returns></returns>
-        public static ElementControl GetSelectedElement(Canvas canvas)
+        public static ElementControl GetSelectedElement()
         {
-            foreach (UIElement child in canvas.Children)
-            {
-                if (child is ElementControl control)
-                {
-                    if (control.IsSelected)
-                    {
-                        return control;
-                    }
-
-                }
-            }
-            return null;
+            return Elements.First(c => c.IsSelected);
         }
 
         /// <summary>
@@ -125,40 +79,30 @@ namespace LogicalConstructor
         public static ElementControl CreateElementControl(ElementClass element,RoutedEventHandler menuHandler)
         {
             ElementControl el = new ElementControl();
-            Panel.SetZIndex(el, GraphClass.ElementZIndex++);
+            Panel.SetZIndex(el, ElementZIndex++);
             el.Element = element;
             el.UpdateView();
             el.SetLocation(element.Location);
-            MenuItem conntectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
-            conntectionMenuItem.Click += menuHandler;
-            el.MainGrid.ContextMenu?.Items.Insert(2, conntectionMenuItem);
+            MenuItem connectionMenuItem = new MenuItem() { Header = "_Соединить элемент" };
+            connectionMenuItem.Click += menuHandler;
+            el.MainGrid.ContextMenu?.Items.Insert(2, connectionMenuItem);
+            Elements.Add(el);
             return el;
         }
 
-        ///// <summary>
-        ///// Получение связи между двумя элементами для прорисовки линий
-        ///// </summary>
-        ///// <param name="startElement"></param>
-        ///// <param name="finishElement"></param>
-        ///// <returns></returns>
-        //public static Connection GetConnectionByTwoControls(ElementClass startElement, ElementClass finishElement, string numberConnection)
-        //{
-        //    ElementControl control=new ElementControl();
-        //    Connection connection = new Connection()
-        //    {
-        //        Start = startElement.Id,
-        //        Finish = finishElement.Id,
-        //        StartPoint = startElement.Location,
-        //        FinishPoint = finishElement.Location,
-        //        Number = numberConnection
-                
-        //    };
-        //    connection.CalculatePoints();
-        //    Panel.SetZIndex(connection.Line, ConnectionZIndex++);
-        //    return connection;
-        //}
+        public static InOutControl CreateInControl(ElementClass element)
+        {
+            InOutControl control = new InOutControl {NameLabel = {Text = element.Name}, Element = element};
+            control.SetLocation(element.Location);
+            return control;
+        }
 
-
+        public static InOutControl CreateOutControl(ElementClass element)
+        {
+            InOutControl control = new InOutControl { NameLabel = { Text = element.Name }, Element = element };
+            control.SetLocation(element.Location);
+            return control;
+        }
 
         /// <summary>
         /// Порядок элемента на форме

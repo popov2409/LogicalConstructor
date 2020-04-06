@@ -28,6 +28,7 @@ namespace LogicalConstructor.DbProxy
         /// </summary>
         public int InCount { get; set; }
         
+        public string Name { get; set; }
 
         public ElementClass()
         {
@@ -107,7 +108,17 @@ namespace LogicalConstructor.DbProxy
 
         private void Line_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            Selected();
+        }
+
+        public void Selected()
+        {
             Line.Stroke = Brushes.Blue;
+        }
+
+        public void UnSelected()
+        {
+            Line.Stroke = Brushes.Black;
         }
     }
 }

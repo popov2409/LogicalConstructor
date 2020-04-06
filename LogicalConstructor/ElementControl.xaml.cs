@@ -25,7 +25,7 @@ namespace LogicalConstructor
         /// <summary>
         /// Выделен ли контрол
         /// </summary>
-        public bool IsSelected;
+        public bool IsSelected=false;
         
         /// <summary>
         /// Положение мыши относительно контрола(необходимо для правильного позиционирования при перетаскивании элемента)
@@ -37,22 +37,17 @@ namespace LogicalConstructor
         /// </summary>
         public bool IsDrag;
 
-        private Dictionary<int, string> _names;
-        public ElementControl()
+        private Dictionary<int, string> _names = new Dictionary<int, string>
+        {
+            {0, "И"},
+            {1, "ИЛИ"},
+            {2, "НЕ"},
+            {3, "И-НЕ"},
+            {4, "ИЛИ-НЕ"}
+        };
+    public ElementControl()
         {
             InitializeComponent();
-            IsSelected = false;
-            InitializeDictionary();
-        }
-
-        void InitializeDictionary()
-        {
-            _names=new Dictionary<int, string>();
-            _names.Add(0,"И");
-            _names.Add(1, "ИЛИ");
-            _names.Add(2, "НЕ");
-            _names.Add(3, "И-НЕ");
-            _names.Add(4, "ИЛИ-НЕ");
         }
 
         /// <summary>
@@ -88,11 +83,10 @@ namespace LogicalConstructor
         /// <summary>
         /// Снятие выделения
         /// </summary>
-        public void Unselected()
+        public void UnSelected()
         {
             IsSelected = false;
             SetColor(Brushes.Black);
-           // this.ReleaseMouseCapture();
         }
 
         private void ElementControl_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)

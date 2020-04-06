@@ -8,24 +8,19 @@ using System.Threading.Tasks;
 
 namespace LogicalConstructor.DbProxy
 {
-    public class SaverClass
+    public static class SaverClass
     {
-        public List<ElementClass> Elements { get; set; }
-        public SaverClass()
-        {
-            Elements = new List<ElementClass>();
-        }
+        public static List<ElementClass> Elements = new List<ElementClass>();
 
-
-        public async Task SaveData(string path)
+        public static async Task SaveData(string path)
         {
             using (FileStream fs = new FileStream(path, FileMode.Create))
             {
-                await JsonSerializer.SerializeAsync<List<ElementClass> >(fs, Elements);
+                await JsonSerializer.SerializeAsync(fs, Elements);
             }
         }
 
-        public void LoadData(string path)
+        public static void LoadData(string path)
         {
             string jsonString = File.ReadAllText(path);
             Elements = JsonSerializer.Deserialize<List<ElementClass>>(jsonString);

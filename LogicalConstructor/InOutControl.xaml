@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:LogicalConstructor"
              mc:Ignorable="d" 
              Height="40" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top">
-    <Grid>
+    <Grid Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition/>
