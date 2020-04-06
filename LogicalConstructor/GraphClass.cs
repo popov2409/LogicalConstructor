@@ -73,12 +73,15 @@ namespace LogicalConstructor
 
 
         /// <summary>
-        /// Получниение выделенного элемента
+        /// Получниение Id выделенного элемента
         /// </summary>
         /// <returns></returns>
-        public static ElementControl GetSelectedElement()
+        public static string GetIdElementSource()
         {
-            return Elements.First(c => c.IsSelected);
+            ElementControl el= Elements.FirstOrDefault(c => c.IsSelected);
+            InOutControl inControl = InOutControls.FirstOrDefault(c => c.IsSelected);
+
+            return el != null ? el.Element.Id.ToString() : (inControl != null ? inControl.Element.Id.ToString() : null);
         }
 
         /// <summary>
@@ -102,6 +105,7 @@ namespace LogicalConstructor
         public static InOutControl CreateInControl(ElementClass element)
         {
             InOutControl control = new InOutControl {NameLabel = {Text = element.Name}, Element = element};
+            Panel.SetZIndex(control, ElementZIndex++);
             control.SetLocation(element.Location);
             InOutControls.Add(control);
             return control;
@@ -110,9 +114,20 @@ namespace LogicalConstructor
         public static InOutControl CreateOutControl(ElementClass element)
         {
             InOutControl control = new InOutControl { NameLabel = { Text = element.Name }, Element = element };
+            Panel.SetZIndex(control, ElementZIndex++);
             control.SetLocation(element.Location);
             InOutControls.Add(control);
             return control;
+        }
+
+        public static void RemoveAll()
+        {
+            ElementZIndex = 10000;
+            ConnectionZIndex = 0;
+            Elements.Clear();
+            Connections.Clear();
+            InOutControls.Clear();
+
         }
 
         /// <summary>

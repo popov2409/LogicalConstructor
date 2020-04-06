@@ -30,7 +30,7 @@ namespace LogicalConstructor
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            ElementClass element=new ElementClass(){Location = _mousePoint};
+            ElementClass element=new ElementClass{Location = _mousePoint};
             ElementControl el = GraphClass.CreateElementControl(element, ConntectionMenuItem_Click);
             el.PreviewMouseMove += El_PreviewMouseMove;
             SaverClass.Elements.Add(element);
@@ -40,7 +40,7 @@ namespace LogicalConstructor
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             ElementControl element=sender as ElementControl;
-            if (sender as ElementControl == null || !element.IsSelected || !element.IsDrag) return;
+            if (!(sender is ElementControl) || !element.IsSelected || !element.IsDrag) return;
             element.SetLocation(e.GetPosition(EditorCanvas));
             foreach (Connection connection in GraphClass.Connections
                 .Where(c => c.Start.Id == element.Element.Id || c.Finish.Id == element.Element.Id).ToList())
@@ -96,13 +96,30 @@ namespace LogicalConstructor
                     {
                         case 10:
                         {
-                            EditorCanvas.Children.Add(GraphClass.CreateInControl(element));
+
+                            InOutControl inControl = GraphClass.CreateInControl(element);
+                            inControl.MainGrid.ContextMenu = new ContextMenu();
+                            inControl.MainGrid.ContextMenu.Items.Add(new MenuItem() {Header = "_Соединить вход"});
+                            (inControl.MainGrid.ContextMenu.Items[0] as MenuItem).Click += ConntectionMenuItem_Click;
+                            EditorCanvas.Children.Add(inControl);
                             continue;
                         }
                         case 11:
                         {
                             EditorCanvas.Children.Add(GraphClass.CreateOutControl(element));
-                            continue;
+                            foreach (Guid id in element.InElements)
+                            {
+                                Connection connection = new Connection()
+                                {
+                                    Start = SaverClass.Elements.First(c => c.Id == id),
+                                    Finish = element
+                                };
+                                connection.CalculatePoints();
+                                Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
+                                GraphClass.Connections.Add(connection);
+                                EditorCanvas.Children.Add(connection.Line);
+                            }
+                                continue;
                         }
                     }
 
@@ -114,7 +131,7 @@ namespace LogicalConstructor
                         Connection connection = new Connection()
                         {
                             Start = SaverClass.Elements.First(c => c.Id == id),
-                            Finish = el.Element
+                            Finish = element
                         };
                         connection.CalculatePoints();
                         Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
@@ -131,30 +148,29 @@ namespace LogicalConstructor
         private void ConntectionMenuItem_Click(object sender, RoutedEventArgs e)
         {
             _connectionMode = true;
-            _idSource = GraphClass.GetSelectedElement().Element.Id;
+            _idSource = Guid.Parse(GraphClass.GetIdElementSource());
         }
 
         /// <summary>
         /// Удаление элемента
         /// </summary>
         /// <param name="el"></param>
-        void RemoveElement(ElementControl el)
+        void RemoveElement(Guid idElement)
         {
-            SaverClass.Elements.Remove(SaverClass.Elements.First(c => c.Id == el.Element.Id));
-            GraphClass.Elements.Remove(el);
-            EditorCanvas.Children.Remove(el);
+            SaverClass.Elements.Remove(SaverClass.Elements.First(c => c.Id == idElement));
+            EditorCanvas.Children.Remove(GraphClass.Elements.First(c => c.Element.Id == idElement));
+            GraphClass.Elements.Remove(GraphClass.Elements.First(c=>c.Element.Id==idElement));
         }
 
         private void EditorCanvas_OnPreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
             {
-                ElementControl el = GraphClass.GetSelectedElement();
-
+                ElementControl el = GraphClass.Elements.First(c => c.IsSelected);
                 if (el == null) return;
                 if (MessageBox.Show("Вы действительно хотите удалить элемент?", "", MessageBoxButton.YesNo) !=
                     MessageBoxResult.Yes) return;
-                RemoveElement(el);
+                RemoveElement(el.Element.Id);
             }
         }
 
@@ -163,32 +179,35 @@ namespace LogicalConstructor
         /// </summary>
         void SetConnection()
         {
-            ElementControl el = GraphClass.GetSelectedElement();
-            if (el == null)
+            string elID = GraphClass.GetIdElementSource();
+            if (elID == null)
             {
                 _connectionMode = false;
                 return;
             }
+            //var el = GraphClass.Elements.FirstOrDefault(c => c.Element.Id == Guid.Parse(elID));
 
-            if (el.Element.InElements.Count >= el.Element.InCount)
+            var el = SaverClass.Elements.First(c => c.Id == Guid.Parse(elID)); 
+
+            if (el.InElements.Count >= el.InCount)
             {
                 MessageBox.Show("У данного элемента задействованы все входы!");
                 _connectionMode = false;
                 return;
             }
 
-            if (el.Element.InElements.Contains(_idSource))
+            if (el.InElements.Contains(_idSource))
             {
                 MessageBox.Show("Данные элементы уже связаны!");
                 _connectionMode = false;
                 return;
             }
 
-            SaverClass.Elements.First(c => c.Id == el.Element.Id).InElements.Add(_idSource);
+            SaverClass.Elements.First(c => c.Id == el.Id).InElements.Add(_idSource);
             Connection connection = new Connection()
             {
                 Start = SaverClass.Elements.First(c => c.Id == _idSource),
-                Finish = el.Element
+                Finish = el
             };
             Panel.SetZIndex(connection.Line, GraphClass.ConnectionZIndex++);
             connection.CalculatePoints();
@@ -207,7 +226,11 @@ namespace LogicalConstructor
         {
             ElementClass element = new ElementClass() {InCount = 0, Type = 10,Name = $"X{SaverClass.Elements.Count(c => c.Type == 10)}" };
             SaverClass.Elements.Add(element);
-            EditorCanvas.Children.Add(GraphClass.CreateInControl(element));
+            InOutControl inControl = GraphClass.CreateInControl(element);
+            inControl.MainGrid.ContextMenu=new ContextMenu();
+            inControl.MainGrid.ContextMenu.Items.Add(new MenuItem() {Header = "_Соединить вход"});
+            (inControl.MainGrid.ContextMenu.Items[0] as MenuItem).Click += ConntectionMenuItem_Click;
+            EditorCanvas.Children.Add(inControl);
             UpdateViewInOut();
             InitializeOutControl();
 
@@ -221,7 +244,7 @@ namespace LogicalConstructor
                 Type = 11,
                 InCount = 1,
                 Name = "Y",
-                Location = new Point(EditorCanvas.ActualWidth - 40, EditorCanvas.ActualHeight / 2 - 50)
+                Location = new Point(EditorCanvas.ActualWidth - 26, EditorCanvas.ActualHeight / 2 - 50)
             };
             SaverClass.Elements.Add(element);
             EditorCanvas.Children.Add(GraphClass.CreateOutControl(element));
@@ -240,6 +263,12 @@ namespace LogicalConstructor
                 inControl.SetLocation(startPoint);
                 startPoint.Y += 2 * dEl;
             }
+        }
+
+        private void ClearAllMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            EditorCanvas.Children.Clear();
+            GraphClass.RemoveAll();
         }
     }
 }
