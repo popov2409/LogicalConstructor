@@ -53,7 +53,6 @@ namespace LogicalConstructor
         private Point _mousePoint;
         private void EditorCanvas_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            //GraphClass.ClearAllSelection(EditorCanvas);
             GraphClass.ClearAllSelection();
             _mousePoint = e.GetPosition(EditorCanvas);
         }
@@ -142,6 +141,7 @@ namespace LogicalConstructor
         void RemoveElement(ElementControl el)
         {
             SaverClass.Elements.Remove(SaverClass.Elements.First(c => c.Id == el.Element.Id));
+            GraphClass.Elements.Remove(el);
             EditorCanvas.Children.Remove(el);
         }
 

@@ -77,7 +77,6 @@ namespace LogicalConstructor
         {
             IsSelected = true;
             SetColor(Brushes.Blue);
-           // this.CaptureMouse();
         }
 
         /// <summary>

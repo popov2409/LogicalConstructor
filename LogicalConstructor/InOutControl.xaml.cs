@@ -21,6 +21,7 @@ namespace LogicalConstructor
     /// </summary>
     public partial class InOutControl : UserControl
     {
+        public bool IsSelected = false;
         public InOutControl()
         {
             InitializeComponent();
@@ -34,7 +35,28 @@ namespace LogicalConstructor
             Canvas.SetTop(this,point.Y);
             if(Element==null) return;
             Element.Location = point;
+        }
 
+        void SetColor(Brush brush)
+        {
+            NameLabel.Foreground = brush;
+            Ellipse.Stroke = brush;
+        }
+
+        public void Selected()
+        {
+            SetColor(Brushes.Blue);
+            IsSelected = true;
+        }
+        public void UnSelected()
+        {
+            SetColor(Brushes.Black);
+            IsSelected = false;
+        }
+
+        private void InOutControl_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Selected();
         }
     }
 }

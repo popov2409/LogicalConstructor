@@ -17,10 +17,13 @@ namespace LogicalConstructor
 
         public static List<ElementControl> Elements=new List<ElementControl>();
         public static List<Connection> Connections = new List<Connection>();
+        public static List<InOutControl> InOutControls=new List<InOutControl>();
+
         /// <summary>
         /// Получить координату конечной точки связи в зависимости от колличества входов и их занятости
         /// </summary>
         /// <param name="element"></param>
+        /// <param name="numConnection"></param>
         /// <returns></returns>
         static Point GetFinishPoint(ElementClass element, int numConnection)
         {
@@ -60,6 +63,12 @@ namespace LogicalConstructor
             {
                 connection.UnSelected();
             }
+
+            foreach (InOutControl inOutControl in InOutControls)
+            {
+                inOutControl.UnSelected();
+            }
+
         }
 
 
@@ -94,6 +103,7 @@ namespace LogicalConstructor
         {
             InOutControl control = new InOutControl {NameLabel = {Text = element.Name}, Element = element};
             control.SetLocation(element.Location);
+            InOutControls.Add(control);
             return control;
         }
 
@@ -101,6 +111,7 @@ namespace LogicalConstructor
         {
             InOutControl control = new InOutControl { NameLabel = { Text = element.Name }, Element = element };
             control.SetLocation(element.Location);
+            InOutControls.Add(control);
             return control;
         }
 
