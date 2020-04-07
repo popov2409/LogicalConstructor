@@ -101,7 +101,6 @@ namespace LogicalConstructor
                 {
                     int j = _elements.ToList().IndexOf(_elements.First(c => c.Id == idElement));
                     _smejnost[i, j] = 1;
-                  //  _smejnost[j, i] = 1;
                 }
             }
 
@@ -120,17 +119,16 @@ namespace LogicalConstructor
         {
             for (int i = 0; i < _n; i++)
             {
-                _type[i] = $"{_elements[i].Type.ToString()}#-";
+                _type[i] = $"{_elements[i].Type}#-";
             }
 
             for (int i = 0; i < inSignals.Count; i++)
             {
-                _type[i] = _type[i].Split('#')[0] + "#" + inSignals[i];
+                _type[i] = $"{_type[i].Split('#')[0]}#{inSignals[i]}";
             }
 
             while (_type.Count(s => s.Contains("-")) > 0)
             {
-                int yy = _type.Count(s => s.Contains("-"));
                 for (int i = 0; i < _n; i++)
                 {
                     if (_type[i].Contains("-"))
@@ -146,34 +144,29 @@ namespace LogicalConstructor
                             continue;
                         }
 
-                        List<int> list = new List<int>();
-                        foreach (string s in tempList)
-                        {
-                            list.Add(int.Parse(s.Split('#')[1]));
-                        }
+                        List<int> list = tempList.Select(c => c.Split('#')[1]).Select(int.Parse).ToList();
 
                         switch (int.Parse(_type[i].Split('#')[0]))
                         {
                             case 0:
-                                _type[i] = _type[i].Split('#')[0] + "#" + And(list);
+                                _type[i] = $"{_type[i].Split('#')[0]}#{And(list)}";
                                 break;
                             case 1:
-                                _type[i] = _type[i].Split('#')[0] + "#" + Or(list);
+                                _type[i] = $"{_type[i].Split('#')[0]}#{Or(list)}";
                                 break;
                             case 2:
-                                _type[i] = _type[i].Split('#')[0] + "#" + Not(list[0]);
+                                _type[i] = $"{_type[i].Split('#')[0]}#{Not(list[0])}";
                                 break;
                             case 3:
-                                _type[i] = _type[i].Split('#')[0] + "#" + AndNot(list);
+                                _type[i] = $"{_type[i].Split('#')[0]}#{AndNot(list)}";
                                 break;
                             case 4:
-                                _type[i] = _type[i].Split('#')[0] + "#" + OrNot(list);
+                                _type[i] = $"{_type[i].Split('#')[0]}#{OrNot(list)}";
                                 break;
                             case 11:
-                                _type[i] = _type[i].Split('#')[0] + "#" + list[0];
+                                _type[i] = $"{_type[i].Split('#')[0]}#{list[0]}";
                                 break;
                         }
-
                     }
                 }
             }
