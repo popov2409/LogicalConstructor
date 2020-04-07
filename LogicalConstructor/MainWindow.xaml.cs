@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LogicalConstructor.DbProxy;
+using LogicalConstructor.View;
 using Microsoft.Win32;
 
 namespace LogicalConstructor
@@ -269,6 +270,11 @@ namespace LogicalConstructor
         {
             EditorCanvas.Children.Clear();
             GraphClass.RemoveAll();
+        }
+
+        private void CalculateSchemaItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            new CalculateSchemaWindow().ShowDialog();
         }
     }
 }

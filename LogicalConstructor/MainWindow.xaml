@@ -24,7 +24,7 @@
                     <MenuItem Name="ExitMenuItem" Header="_Выход" Click="ExitMenuItem_OnClick"/>
                 </MenuItem>
                 <MenuItem Header="_Схема">
-                    <MenuItem Header="_Проверить решение" />
+                    <MenuItem Name="CalculateSchemaItem" Header="_Проверить решение" Click="CalculateSchemaItem_OnClick" />
                 </MenuItem>
             </Menu>
         </DockPanel>

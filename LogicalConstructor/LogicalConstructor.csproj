@@ -83,11 +83,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Calculater.cs" />
     <Compile Include="DbProxy\ElementClass.cs" />
     <Compile Include="DbProxy\SaverClass.cs" />
     <Compile Include="GraphClass.cs" />
     <Compile Include="InOutControl.xaml.cs">
       <DependentUpon>InOutControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CalculateSchemaWindow.xaml.cs">
+      <DependentUpon>CalculateSchemaWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ElementProperty.xaml.cs">
       <DependentUpon>ElementProperty.xaml</DependentUpon>
@@ -115,6 +119,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\CalculateSchemaWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ElementProperty.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

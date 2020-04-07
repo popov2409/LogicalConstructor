@@ -71,7 +71,6 @@ namespace LogicalConstructor.DbProxy
             if (Start.Type > 9)
             {
                 width = new InOutControl().Width;
-                // height = 20;
             }
             Point point = new Point(Start.Location.X + Math.Truncate(width / 2),
                 Start.Location.Y + height / 2);
