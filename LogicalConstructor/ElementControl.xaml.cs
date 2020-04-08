@@ -112,7 +112,6 @@ namespace LogicalConstructor
         private void PropertyItem_OnClick(object sender, RoutedEventArgs e)
         {
             new ElementProperty(this).ShowDialog();
-            UpdateView();
         }
 
         /// <summary>

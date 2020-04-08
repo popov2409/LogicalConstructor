@@ -46,6 +46,7 @@ namespace LogicalConstructor.View
         {
             _element.Element.Type = ElementTypeComboBox.SelectedIndex;
             _element.Element.InCount = int.Parse(InCountTextBox.Text);
+            _element.UpdateView();
             this.Close();
         }
     }
