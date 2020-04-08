@@ -30,7 +30,8 @@ namespace LogicalConstructor.View
         }
 
         List<string> _inSignals;
-        private TextBlock _outTb;
+        private List<TextBlock> _outTextBlocks;
+
         void InitializeDataSchema()
         {
             _inSignals=new List<string>();
@@ -62,27 +63,34 @@ namespace LogicalConstructor.View
                 i++;
             }
 
-            InOutGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            TextBlock txx = new TextBlock()
-            {
-                Text = "Y",
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 5, 0)
-            };
-            Grid.SetRow(txx, 0);
-            Grid.SetColumn(txx, i);
-            _outTb = new TextBlock()
-            {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 5, 0)
-            };
-            Grid.SetRow(_outTb, 1);
-            Grid.SetColumn(_outTb, i);
-            InOutGrid.Children.Add(txx);
-            InOutGrid.Children.Add(_outTb);
+            InOutGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+            i++;
 
+            _outTextBlocks=new List<TextBlock>();
+            foreach (ElementClass elementClass in SaverClass.Elements.Where(c => c.Type == 11)
+                .OrderByDescending(c => c.Name))
+            {
+                InOutGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(25) });
+                TextBlock txx = new TextBlock()
+                {
+                    Text = elementClass.Name,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                Grid.SetRow(txx, 0);
+                Grid.SetColumn(txx, i);
+                TextBlock _outTb = new TextBlock()
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                Grid.SetRow(_outTb, 1);
+                Grid.SetColumn(_outTb, i);
+                InOutGrid.Children.Add(txx);
+                InOutGrid.Children.Add(_outTb);
+                _outTextBlocks.Add(_outTb);
+                i++;
+            }
         }
 
         private void Cb_Unchecked(object sender, RoutedEventArgs e)
@@ -97,7 +105,12 @@ namespace LogicalConstructor.View
 
         private void CalculateButton_OnClick(object sender, RoutedEventArgs e)
         {
-            _outTb.Text = Calculater.Calculate(_inSignals);
+            List<string> lst = Calculater.Calculate(_inSignals);
+            for (int i = 0; i < lst.Count; i++)
+            {
+                _outTextBlocks[i].Text = lst[i].Split('#')[1];
+            }
+            
         }
     }
 }

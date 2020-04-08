@@ -15,56 +15,6 @@ namespace LogicalConstructor
         //{3, "И-НЕ"},
         //{4, "ИЛИ-НЕ"}
 
-        /// <summary>
-        /// Метод расчета логического элемента "НЕ"
-        /// </summary>
-        /// <param name="A"></param>
-        /// <returns></returns>
-        static string Not(int A) 
-        {
-            return (A == 1 ? 0 : 1).ToString();
-        }
-        
-        /// <summary>
-        /// Метод расчета логического элемента "ИЛИ"
-        /// </summary>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        static string Or(List<int> B)  
-        {
-            return B.Max().ToString();
-        }
-        /// <summary>
-        /// Метод расчета логического элемента "ИЛИ-НЕ"
-        /// </summary>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        static string OrNot(List<int> B)
-        {
-            return (B.Max()==1?0:1).ToString();
-        }
-        /// <summary>
-        /// Метод расчета логического элемента "И-НЕ"
-        /// </summary>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        static string AndNot(List<int> B)
-        {
-            return (B.Min() == 0 ? 1 : 0).ToString();
-        }
-
-        /// <summary>
-        /// Метод расчета логического элемента "И"
-        /// </summary>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        static string And(List<int> B)
-        {
-            return B.Min().ToString();
-        }
-
-
-
         static int _n = 0;
         static int[,] _smejnost;
 
@@ -88,11 +38,15 @@ namespace LogicalConstructor
                 _elements[k] = element;
                 k++;
             }
-            _elements[k] = SaverClass.Elements.First(c => c.Type > 10);
+            foreach (ElementClass element in SaverClass.Elements.Where(c => c.Type == 11).OrderByDescending(c => c.Name))
+            {
+                _elements[k] = element;
+                k++;
+            }
 
             for (int i = 0; i < _n; i++) // Ввод матрицы типов размера N*3
             {
-                _type[i] = $"{_elements[i].Type.ToString()}#-";
+                _type[i] = $"{_elements[i].Type}#-";
             }
 
             for (int i = 0; i < _n; i++)
@@ -115,7 +69,7 @@ namespace LogicalConstructor
            
         }
 
-        public static string Calculate(List<string> inSignals)
+        public static List<string> Calculate(List<string> inSignals)
         {
             for (int i = 0; i < _n; i++)
             {
@@ -148,29 +102,30 @@ namespace LogicalConstructor
 
                         switch (int.Parse(_type[i].Split('#')[0]))
                         {
-                            case 0:
-                                _type[i] = $"{_type[i].Split('#')[0]}#{And(list)}";
+                            case 0: //И
+                                _type[i] = $"{_type[i].Split('#')[0]}#{list.Min()}";
                                 break;
-                            case 1:
-                                _type[i] = $"{_type[i].Split('#')[0]}#{Or(list)}";
+                            case 1: //ИЛИ
+                                _type[i] = $"{_type[i].Split('#')[0]}#{list.Max()}";
                                 break;
-                            case 2:
-                                _type[i] = $"{_type[i].Split('#')[0]}#{Not(list[0])}";
+                            case 2://НЕ
+                                _type[i] = $"{_type[i].Split('#')[0]}#{Convert.ToInt32(list[0]==0)}";
                                 break;
-                            case 3:
-                                _type[i] = $"{_type[i].Split('#')[0]}#{AndNot(list)}";
+                            case 3://И-НЕ
+                                _type[i] = $"{_type[i].Split('#')[0]}#{Convert.ToInt32(list.Min()==0)}";
                                 break;
-                            case 4:
-                                _type[i] = $"{_type[i].Split('#')[0]}#{OrNot(list)}";
+                            case 4://ИЛИ-НЕ
+                                _type[i] = $"{_type[i].Split('#')[0]}#{Convert.ToInt32(list.Max()==0)}";
                                 break;
-                            case 11:
+                            case 11://ВЫХОД
                                 _type[i] = $"{_type[i].Split('#')[0]}#{list[0]}";
                                 break;
                         }
                     }
                 }
             }
-            return _type[_n - 1].Split('#')[1];
+
+            return _type.Skip(_type.Length - _type.Count(c => c.Split('#')[0].Equals("11"))).ToList();
         }
     }
 }

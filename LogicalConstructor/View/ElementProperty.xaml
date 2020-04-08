@@ -33,7 +33,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Button Name="SaveButton" Grid.Column="0"  Margin="2" Content="Сохранить" Click="SaveButton_OnClick"/>
+            <Button Name="SaveButton" Grid.Column="0"  Margin="2" Content="Применить" Click="SaveButton_OnClick"/>
             <Button Name="CancelButton" Grid.Column="1" Margin="2" Content="Отменить" Click="CancelButton_OnClick"/>
         </Grid>
 

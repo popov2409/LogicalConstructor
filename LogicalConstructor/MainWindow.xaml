@@ -33,7 +33,9 @@
             <Canvas.ContextMenu>
                 <ContextMenu>
                     <MenuItem Name="AddElementMenuItem"  Header="_Добавить элемент"  Click="AddElementMenuItem_OnClick"/>
-                    <MenuItem Name="AddInOutMenuItem" Header="_Добавить вход" Click="AddInOutMenuItem_OnClick"/>
+                    <Separator/>
+                    <MenuItem Name="AddInMenuItem" Header="_Добавить вход" Click="AddInMenuItem_OnClick"/>
+                    <MenuItem Name="AddOutMenuItem" Header="_Добавить выход" Click="AddOutMenuItem_OnClick"/>
                     <Separator/>
                     <MenuItem Name="ClearAllMenuItem" Header="_Удалить все" Click="ClearAllMenuItem_OnClick"></MenuItem>
 

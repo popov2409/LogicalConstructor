@@ -125,6 +125,7 @@ namespace LogicalConstructor
             ElementZIndex = 10000;
             ConnectionZIndex = 0;
             Elements.Clear();
+            SaverClass.Elements.Clear();
             Connections.Clear();
             InOutControls.Clear();
 

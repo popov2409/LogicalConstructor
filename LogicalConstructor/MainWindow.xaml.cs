@@ -223,7 +223,7 @@ namespace LogicalConstructor
             SetConnection();
         }
 
-        private void AddInOutMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void AddInMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ElementClass element = new ElementClass() {InCount = 0, Type = 10,Name = $"X{SaverClass.Elements.Count(c => c.Type == 10)}" };
             SaverClass.Elements.Add(element);
@@ -232,29 +232,23 @@ namespace LogicalConstructor
             inControl.MainGrid.ContextMenu.Items.Add(new MenuItem() {Header = "_Соединить вход"});
             (inControl.MainGrid.ContextMenu.Items[0] as MenuItem).Click += ConntectionMenuItem_Click;
             EditorCanvas.Children.Add(inControl);
-            UpdateViewInOut();
-            InitializeOutControl();
-
+            UpdateViewIn();
         }
 
-        void InitializeOutControl()
+
+        private void AddOutMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            if (SaverClass.Elements.Count(c => c.Type == 11) > 0) return;
-            ElementClass element = new ElementClass
-            {
-                Type = 11,
-                InCount = 1,
-                Name = "Y",
-                Location = new Point(EditorCanvas.ActualWidth - 40, EditorCanvas.ActualHeight / 2 - 50)
-            };
+            ElementClass element = new ElementClass() { InCount = 1, Type = 11, Name = $"Y{SaverClass.Elements.Count(c => c.Type == 11)}" };
             SaverClass.Elements.Add(element);
-            EditorCanvas.Children.Add(GraphClass.CreateOutControl(element));
+            InOutControl outControl = GraphClass.CreateInControl(element);
+            EditorCanvas.Children.Add(outControl);
+            UpdateViewOut();
         }
 
         /// <summary>
         /// Обновить отображение входов при добавлении
         /// </summary>
-        void UpdateViewInOut()
+        void UpdateViewIn()
         {
             var dEl = (EditorCanvas.ActualHeight-50) / SaverClass.Elements.Count(c => c.Type == 10)/2;
             Point startPoint = new Point(20, dEl);
@@ -262,6 +256,17 @@ namespace LogicalConstructor
             foreach (InOutControl inControl in EditorCanvas.Children.OfType<InOutControl>().Where(c=>c.Element.Type==10))
             {
                 inControl.SetLocation(startPoint);
+                startPoint.Y += 2 * dEl;
+            }
+        }
+
+        void UpdateViewOut()
+        {
+            var dEl = (EditorCanvas.ActualHeight - 50) / SaverClass.Elements.Count(c => c.Type == 11) / 2;
+            Point startPoint = new Point(EditorCanvas.ActualWidth - 50, dEl);
+            foreach (InOutControl outControl in EditorCanvas.Children.OfType<InOutControl>().Where(c => c.Element.Type == 11))
+            {
+                outControl.SetLocation(startPoint);
                 startPoint.Y += 2 * dEl;
             }
         }
@@ -276,5 +281,6 @@ namespace LogicalConstructor
         {
             new CalculateSchemaWindow().ShowDialog();
         }
+
     }
 }
