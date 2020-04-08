@@ -36,6 +36,8 @@ namespace LogicalConstructor
             el.PreviewMouseMove += El_PreviewMouseMove;
             SaverClass.Elements.Add(element);
             EditorCanvas.Children.Add(el);
+            new ElementProperty(el).ShowDialog();
+            el.UpdateView();
         }
 
         private void El_PreviewMouseMove(object sender, MouseEventArgs e)
