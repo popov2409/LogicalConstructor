@@ -162,8 +162,19 @@ namespace LogicalConstructor
         {
             
             EditorCanvas.Children.Remove(GraphClass.Elements.First(c => c.Element.Id == idElement));
-            foreach (Connection connection in GraphClass.Connections.Where(c=>c.Start.Id==idElement||c.Finish.Id==idElement).ToList())
+            foreach (Connection connection in GraphClass.Connections.Where(c=>c.Finish.Id==idElement).ToList())
             {
+                EditorCanvas.Children.Remove(connection.Line);
+                GraphClass.Connections.Remove(connection);
+            }
+
+            foreach (Connection connection in GraphClass.Connections.Where(c => c.Start.Id == idElement).ToList())
+            {
+                foreach (ElementClass elementClass in SaverClass.Elements.Where(c=>c.Id==connection.Finish.Id))
+                {
+                    elementClass.InElements.Remove(idElement);
+                }
+
                 EditorCanvas.Children.Remove(connection.Line);
                 GraphClass.Connections.Remove(connection);
             }
