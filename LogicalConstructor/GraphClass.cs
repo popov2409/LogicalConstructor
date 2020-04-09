@@ -132,6 +132,17 @@ namespace LogicalConstructor
         }
 
         /// <summary>
+        /// Удаление элемента
+        /// </summary>
+        /// <param name="idElement"></param>
+        public static void RemoveElement(Guid idElement)
+        {
+            SaverClass.Elements.Remove(SaverClass.Elements.First(c => c.Id == idElement));
+            Elements.Remove(GraphClass.Elements.First(c => c.Element.Id == idElement));
+
+        }
+
+        /// <summary>
         /// Порядок элемента на форме
         /// </summary>
         public static int ElementZIndex = 10000;

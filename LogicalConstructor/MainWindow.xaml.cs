@@ -27,6 +27,7 @@ namespace LogicalConstructor
         public MainWindow()
         {
             InitializeComponent();
+            
         }
 
         private void AddElementMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -121,7 +122,7 @@ namespace LogicalConstructor
                                 GraphClass.Connections.Add(connection);
                                 EditorCanvas.Children.Add(connection.Line);
                             }
-                                continue;
+                            continue;
                         }
                     }
 
@@ -159,9 +160,14 @@ namespace LogicalConstructor
         /// <param name="el"></param>
         void RemoveElement(Guid idElement)
         {
-            SaverClass.Elements.Remove(SaverClass.Elements.First(c => c.Id == idElement));
+            
             EditorCanvas.Children.Remove(GraphClass.Elements.First(c => c.Element.Id == idElement));
-            GraphClass.Elements.Remove(GraphClass.Elements.First(c=>c.Element.Id==idElement));
+            foreach (Connection connection in GraphClass.Connections.Where(c=>c.Start.Id==idElement||c.Finish.Id==idElement).ToList())
+            {
+                EditorCanvas.Children.Remove(connection.Line);
+                GraphClass.Connections.Remove(connection);
+            }
+            GraphClass.RemoveElement(idElement);
         }
 
         private void EditorCanvas_OnPreviewKeyUp(object sender, KeyEventArgs e)
