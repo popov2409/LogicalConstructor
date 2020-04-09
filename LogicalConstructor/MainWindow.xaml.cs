@@ -174,7 +174,7 @@ namespace LogicalConstructor
         {
             if (e.Key == Key.Delete)
             {
-                ElementControl el = GraphClass.Elements.First(c => c.IsSelected);
+                ElementControl el = GraphClass.Elements.FirstOrDefault(c => c.IsSelected);
                 if (el == null) return;
                 if (MessageBox.Show("Вы действительно хотите удалить элемент?", "", MessageBoxButton.YesNo) !=
                     MessageBoxResult.Yes) return;
